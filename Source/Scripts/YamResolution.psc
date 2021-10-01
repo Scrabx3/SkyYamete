@@ -26,26 +26,6 @@ Keyword Property bleedoutMarkTmp Auto
 int Property DisableDialogue Auto Hidden Conditional
 int primAction = 0
 ; -------------------------------------------- Code
-;/ NOTE Resolutions Algorithm
-1) Define the Primary Winner -> Given by the Script Event starting the Quest
-2) Get the Primary Winners Victim and claim it -> this.getleadDefeated()
-3) Give every other Winner their first Victim -> YamResVictoire.nextVictim()
-4.1) Note down every Actor claiming this Victim -> YamResVictim.claimVictim()
-4.2) The first claiming Actor chooses an Action -> YamResVictoire.getAction()
-5.1) Let every winner path to its claimed Victim -> 5.2 returning true
-5.2) jump to 10) -> 5.2 returning false
-7) Wait for claiming Actor to be near its victim and keep track of arrived CLaimers -> OnPackageEnd()
-* secondary claimers will follow
-8) Execute the chosen Action
-9) repeat 8) until the Actions ending Condition is fulfilled
-10) remove the Victim from the victim pool -> YamResVictoire.clearClaimed()
-* its the Actions responsibility to ensure the Victim will find a fitting exit to its predicament
-* the Action is allowed to break this Loop for individual winners
-11) Get a new nearest Victim -> YamResVictoire.clearClaimed().nextVictim()
-12) go to 4)
-
-The algorithm ends when the Player unloads the primary winner or no winners are finding another next Victim
-/;
 ; =========================================================================
 ; ============================================ START UP
 ; ========================================================================
@@ -302,6 +282,27 @@ EndState
 ; =========================================================================
 ; ============================================ UTILITY
 ; ========================================================================
+;/ NOTE Resolutions Algorithm
+1) Define the Primary Winner -> Given by the Script Event starting the Quest
+2) Get the Primary Winners Victim and claim it -> this.getleadDefeated()
+3) Give every other Winner their first Victim -> YamResVictoire.nextVictim()
+4.1) Note down every Actor claiming this Victim -> YamResVictim.claimVictim()
+4.2) The first claiming Actor chooses an Action -> YamResVictoire.getAction()
+5.1) Let every winner path to its claimed Victim -> 5.2 returning true
+5.2) jump to 10) -> 5.2 returning false
+7) Wait for claiming Actor to be near its victim and keep track of arrived CLaimers -> OnPackageEnd()
+* secondary claimers will follow
+8) Execute the chosen Action
+9) repeat 8) until the Actions ending Condition is fulfilled
+10) remove the Victim from the victim pool -> YamResVictoire.clearClaimed()
+* its the Actions responsibility to ensure the Victim will find a fitting exit to its predicament
+* the Action is allowed to break this Loop for individual winners
+11) Get a new nearest Victim -> YamResVictoire.clearClaimed().nextVictim()
+12) go to 4)
+
+The algorithm ends when the Player unloads the primary winner or no winners are finding another next Victim
+/;
+
 ;/ IDEA add Creature Support, currently filtering them out /;
 ; YamResVictim Function getNearestVic(ReferenceAlias from)
 ;   ObjectReference me = from.GetReference()

@@ -46,7 +46,7 @@ Function EnslaveVictim(Actor victim)
 			Debug.SendAnimationEvent(victim, "staggerStart")
 		EndIf
 		Utility.Wait(2)
-		victim.PlayIdle(OffsetBoundStandingStart)
+		; victim.PlayIdle(OffsetBoundStandingStart)
 		victims[i].ForceRefTo(victim)
 		ActorBase base = victim.GetLeveledActorBase()
 		StorageUtil.SetFormValue(victim, "YamReaperOutfit", base.GetOutfit())

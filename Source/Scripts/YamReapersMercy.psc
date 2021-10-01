@@ -3,100 +3,152 @@ Scriptname YamReapersMercy extends Quest
 ; --------------------------- Property
 YamMCM Property MCM Auto
 Actor Property PlayerRef Auto
-Perk[] Property pReapersMercy Auto
-{KdHpThresh -> 30 35 40 45 50}
-Perk[] Property pLurkingThreat Auto
-{KdHpUnseen -> 10 15 20}
-Perk Property pPiercingStrike Auto
-{KdPierceBlock -> Bool}
-Perk[] Property pExposedStrike Auto
-{KdArmorThresh -> 1 2 3}
-Perk[] Property pAnculo Auto
-{KdCommandedThresh -> 20 30 40}
-GlobalVariable Property ShowMenu Auto
-GlobalVariable Property LevelUp Auto
-GlobalVariable Property Level Auto
-GlobalVariable Property Perks Auto
-; --------------------------- Variables
-int XP = 0
-float Property KdCommandedThresh = 0.0 Auto Hidden
-float Property KdHpThresh = 0.2 Auto Hidden
-float Property KdHpUnseen = 0.0 Auto Hidden
-int Property KdArmorThresh = 0 Auto Hidden
-bool Property KdPierceBlock = false Auto Hidden
+; ======================================================================
+; ================================== SETUP
+; ======================================================================
+Event OnInit()
+	lvProgress = Math.Ceiling(Math.Pow(1.4, (0.13 * (Level.Value + 1))) + 5)
+EndEvent
+
 ; ======================================================================
 ; ================================== REAPERS MERCY PROGRESSION
 ; ======================================================================
+GlobalVariable Property ShowMenu Auto
+Perk[] Property ReapersMercy Auto
+{1 - Unlock Claim; 2 - Unlock Enslave}
+Perk[] Property Anculo Auto
+{Claim a Victim upon Knockdown; 10/15/20% Chance}
+Perk Property Gnade Auto
+{Heal a Victim from Knockdown without using a Potion; 12h Cooldown}
+Perk Property PiercingStrike Auto
+{Reapers Mercy ignores Blocks}
+Perk[] Property Ravage Auto
+{Increase efficiency of Weakened by 10/15/20/25/30%}
+Perk[] Property LurkingThreat Auto
+{Stealthattacks Claim a Victim at 5/7,5/10% Chance}
+Perk Property ShadowsCaptive Auto
+{Stealthkill set the Target essential for 2 Seconds}
+Perk[] Property ReapersResilience Auto
+{Ignore 1/2 Knockdown Triggers per fight}
+Perk Property ReapersGaze Auto
+{Gain an ABility to instantly knockdown a Target without Combat (non hostile)}
+Message[] Property SkillDescriptions Auto
+; -------------------------
+int Property ReapersMercyRank Auto Hidden
+int Property AnculoRank Auto Hidden
+int Property LurkingThreatRank Auto Hidden
+int Property RavageRank Auto Hidden
+int ReapersResilienceRank
+
 Function OpenMenu()
-	; Debug.MessageBox("Open menu..")
 	If(MCM.bNoSkilltree)
-		
+		UIListMenu Menu = UIExtensions.GetMenu("UIListMenu") as UIListMenu
+		int ps = PlayerRef.HasPerk(PiercingStrike) as int
+		int gn = PlayerRef.HasPerk(Gnade) as int
+		int sc = PlayerRef.HasPerk(ShadowsCaptive) as int
+		int rg = PlayerRef.HasPerk(ReapersGaze) as int
+		If(Level.Value >= 20 || ReapersMercyRank == 0)
+			Menu.AddEntryItem("Reapers Mercy (" + ReapersMercyRank + "/2)")
+		EndIf
+		If(ReapersMercyRank > 0)
+			If(Level.Value >= (20 + AnculoRank * 20) || AnculoRank == 3)
+				Menu.AddEntryItem("Anculo (" + AnculoRank + "/3)")
+			EndIf
+			If(Level.Value >= 45)
+				Menu.AddEntryItem("Gnade (" + gn + "/1)")
+			EndIf
+			If(Level.Value >= 30)
+				Menu.AddEntryItem("Piercing Strike (" + ps + "/1)")
+			EndIf
+			If(ps > 0 && Level.Value >= (40 + RavageRank * 10))
+				Menu.AddEntryItem("Ravage (" + RavageRank + "/5)")
+			EndIf
+			If(Level.Value >= (20 + LurkingThreatRank * 15))
+				Menu.AddEntryItem("Lurking Threat (" + LurkingThreatRank + "/3)")
+			EndIf
+			If(LurkingThreatRank > 0 && Level.Value >= 75)
+				Menu.AddEntryItem("Shadow's Captive (" + sc + "/1)")
+			EndIf
+			If(LurkingThreatRank > 0 || ps > 0)
+				If(Level.Value >= (90 + ReapersResilienceRank * 10))
+					Menu.AddEntryItem("Reaper's Resilience (" + ReapersResilienceRank + "/2)")
+				EndIf
+				If(ReapersResilienceRank > 0 && Level.Value >= 100)
+					Menu.AddEntryItem("Reaper's Gaze (" + rg + "/1)")
+				EndIf
+			EndIf
+		EndIf
+		Menu.AddEntryItem("Cancel")
+		Menu.OpenMenu()
+		string sol = Menu.GetResultString()
+		If(sol == ("Reapers Mercy (" + ReapersMercyRank + "/2)") && ReapersMercyRank < 2 && SkillDescriptions[0].Show() == 0)
+			PlayerRef.AddPerk(ReapersMercy[ReapersMercyRank])
+			ReapersMercyRank += 1
+		ElseIf(sol == ("Anculo (" + AnculoRank + "/3)") && AnculoRank < 3 && SkillDescriptions[1].Show() == 0)
+			PlayerRef.AddPerk(Anculo[AnculoRank])
+			AnculoRank += 1
+		ElseIf(sol == ("Gnade (" + gn + "/1)") && gn < 1 && SkillDescriptions[2].Show() == 0)
+			PlayerRef.AddPerk(Gnade)
+		ElseIf(sol == ("Piercing Strike (" + ps + "/1)") && ps < 1 && SkillDescriptions[3].Show() == 0)
+			PlayerRef.AddPerk(PiercingStrike)
+		ElseIf(sol == ("Ravage (" + RavageRank + "/5)") && RavageRank < 5 && SkillDescriptions[4].Show() == 0)
+			PlayerRef.AddPerk(Ravage[RavageRank])
+			RavageRank += 1
+		ElseIf(sol == ("Lurking Threat (" + LurkingThreatRank + "/3)") && LurkingThreatRank < 3 && SkillDescriptions[5].Show() == 0)
+			PlayerRef.AddPerk(LurkingThreat[LurkingThreatRank])
+			LurkingThreatRank += 1
+		ElseIf(sol == ("Shadow's Captive (" + sc + "/1)") && sc < 1 && SkillDescriptions[6].Show() == 0)
+			PlayerRef.AddPerk(ShadowsCaptive)
+		ElseIf(sol == ("Reaper's Resilience (" + ReapersResilienceRank + "/2)") && ReapersResilienceRank < 2 && SkillDescriptions[7].Show() == 0)
+			PlayerRef.AddPerk(ReapersResilience[ReapersResilienceRank])
+			ReapersResilienceRank += 1
+		ElseIf(sol == ("Reaper's Gaze (" + rg + "/1)") && rg < 1 && SkillDescriptions[8].Show() == 0)
+			PlayerRef.AddPerk(ReapersGaze)
+		EndIf
 	else
 		ShowMenu.Value = 1
 		Utility.Wait(1)
+		ReapersMercyRank = (PlayerRef.HasPerk(ReapersMercy[0]) as int) + (PlayerRef.HasPerk(ReapersMercy[1]) as int)
+		AnculoRank = (PlayerRef.HasPerk(Anculo[0]) as int) + (PlayerRef.HasPerk(Anculo[1]) as int) + (PlayerRef.HasPerk(Anculo[2]) as int)
+		LurkingThreatRank = (PlayerRef.HasPerk(LurkingThreat[0]) as int) + (PlayerRef.HasPerk(LurkingThreat[1]) as int) + (PlayerRef.HasPerk(LurkingThreat[2]) as int)
+		RavageRank = (PlayerRef.HasPerk(Ravage[0]) as int) + (PlayerRef.HasPerk(Ravage[1]) as int) + (PlayerRef.HasPerk(Ravage[2]) as int) + (PlayerRef.HasPerk(Ravage[3]) as int) + (PlayerRef.HasPerk(Ravage[4]) as int)
+		ReapersResilienceRank =  (PlayerRef.HasPerk(ReapersResilience[0]) as int) + (PlayerRef.HasPerk(ReapersResilience[1]) as int)
 	EndIf
-	; Debug.MessageBox("Waiting over..")
-	SetKdCommandedThresh()
-	SetKdHpThresh()
-	SetKdHpUnseen()
-	SetKdArmorThresh()
-	SetKdPierceBlock()
-EndFunction
-Function SetKdCommandedThresh()
-	int i = pAnculo.length
-	While(i > 0)
-		i -= 1
-		If(PlayerRef.HasPerk(pAnculo[i]))
-			KdCommandedThresh = 0.2 + i * 0.1
-			return
-		EndIf
-	EndWhile
-	KdCommandedThresh = 0.0
-EndFunction
-Function SetKdHpThresh()
-	int i = pReapersMercy.length
-	While(i > 0)
-		i -= 1
-		If(PlayerRef.HasPerk(pReapersMercy[i]))
-			KdHpThresh = 0.3 + i * 0.05
-			return
-		EndIf
-	EndWhile
-	KdHpThresh = 0.2
-EndFunction
-Function SetKdHpUnseen()
-	int i = pLurkingThreat.length
-	While(i > 0)
-		i -= 1
-		If(PlayerRef.HasPerk(pLurkingThreat[i]))
-			KdHpUnseen = 0.1 + i * 0.05
-			return
-		EndIf
-	EndWhile
-	KdHpUnseen = 0.0
-EndFunction
-Function SetKdArmorThresh()
-	int i = pLurkingThreat.length
-	While(i > 0)
-		i -= 1
-		If(PlayerRef.HasPerk(pLurkingThreat[i]))
-			KdArmorThresh = 1 + i
-			return
-		EndIf
-	EndWhile
-	KdArmorThresh = 0
-EndFunction
-Function SetKdPierceBlock()
-	KdPierceBlock =	PlayerRef.HasPerk(pPiercingStrike)
 EndFunction
 
-; NextLvXp = 5 * ThisLv - 2
-; Gain 1 for Claiming, 3 for Missions
-Function AddXP(int gain)
-	XP += gain
-	If(XP >= 5 * Level.Value - 2)
+; ======================================================================
+; ================================== XP SYSTEM
+; ======================================================================
+GlobalVariable Property LevelUp Auto
+GlobalVariable Property Level Auto
+GlobalVariable Property Perks Auto
+GlobalVariable Property Experience Auto
+{Currently stored Experience}
+GlobalVariable Property NextPerkReq Auto
+{Required Xp to gain a new Rank}
+int gainedPerks = 0
+; Total Perks Gained
+int lvProgress
+; Gain 1 Xp for a Knockdown
+; Gain 3 Xp for each sold Victim
+; Gain 5 Xp for completed Quests
+
+; New Perk = (3 * gainedPerks + 1)
+; New Level = Math.Ceiling(Math.Pow(1.4, (0.13 * (CurLv + 1))) + 5)
+Function AddXp(int e)
+	Experience.Value += e
+	lvProgress -= e
+	If(lvProgress <= 0)
+		lvProgress = Math.Ceiling(Math.Pow(1.4, (0.13 * (Level.Value + 1.0))) + 5.0) - (lvProgress * -1)
 		Level.Value += 1
-		Perks.Value += 1
 		LevelUp.Value = Level.Value
 	EndIf
+EndFunction
+
+; Expect this to only be called when Experience >= NextPerkReq
+Function AddPerk()
+	gainedPerks += 1
+	Experience.Value -= NextPerkReq.Value
+	NextPerkReq.Value = 3 * gainedPerks + 1
+	Perks.Value += 1
 EndFunction

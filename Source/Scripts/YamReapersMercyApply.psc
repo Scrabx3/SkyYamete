@@ -1,5 +1,5 @@
 Scriptname YamReapersMercyApply extends ActiveMagicEffect
-{The Cloak Spell applying Reapers Mercy to everyone in the Area. This is essentially the Mainscript for the Ability itself}
+; Redundant Script
 
 ; ----------------------- Property
 YamReapersMercy Property RM Auto

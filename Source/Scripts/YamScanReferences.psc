@@ -5,6 +5,8 @@ See YamPlayerMonitor, YamFollower or YamActor for actual implementation}
 YamScan Property Scan Auto
 YamMain Property Main Auto
 YamMCM Property MCM Auto
+YamReapersMercy Property RM Auto
+YamReapersMercyQst Property RMQ Auto
 Actor Property PlayerRef Auto
 Spell Property calmMark Auto
 Spell Property CacheGear Auto
@@ -75,12 +77,9 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 			EndIf
 		Else ; Player Aggressor
 			bool blocked = MCM.bKdBlock[profile] && abHitBlocked && !PlayerRef.HasPerk(pPiercingStrike)
-			If(!blocked && ReaperKnockdown())
-				If(GetWeakened() || GetVulnerable(myItems))
-					GotoState("Reaper")
-					return
-					return
-				EndIf
+			If(!blocked && ReaperKnockdown() && GetVulnerable(myItems))
+				GotoState("Reaper")
+				return
 			EndIf
     EndIf
   EndIf
@@ -141,7 +140,14 @@ bool Function ReaperKnockdown()
 		If(PlayerRef.IsInFaction(Main.baboDia) || mySelf.IsInFaction(Main.baboDia))
 			return false
 		EndIf
+	Else
+		float healthPer = mySelf.GetActorValuePercentage("Health")
+		float upper = MCM.fKdHpThreshUpper[profile] * (1 + ((5 + RM.RavageRank * 5)/100))
+	  If(healthPer > upper || healthPer < MCM.fKdHpThreshLower[profile])
+			return false
+		EndIf
 	EndIf
+	(Quest.GetQuest("Yam_AgReapersMercy") as YamReapersMercy).AddXp(1)
 	return true
 EndFunction
 
@@ -204,7 +210,11 @@ EndFunction
 State Reaper
 	Event OnBeginState()
 		Debug.Trace("[Yamete] Enter Reaper on " + GetName())
-    Main.npcBleedout(mySelf, -1)
+		If(RM.AnculoRank > 0 && Utility.RandomInt(0, 99) < (5 + RM.AnculoRank * 5))
+			RMQ.ClaimVictim(mySelf)
+		else
+			Main.npcBleedout(mySelf, -1)
+		EndIf
     CleanUp()
 	EndEvent
 EndState

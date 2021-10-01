@@ -7,8 +7,6 @@ Function Fragment_4(ObjectReference akTargetRef, Actor akActor)
 ;BEGIN CODE
 victim = akTargetRef as Actor
 OpenMenu()
-; SetInterfaceOptions()
-; BleedoutInterface()
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -18,8 +16,6 @@ Function Fragment_3(ObjectReference akTargetRef, Actor akActor)
 ;BEGIN CODE
 victim = akTargetRef as Actor
 OpenMenu()
-; SetInterfaceOptions()
-; BleedoutInterface()
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -48,7 +44,7 @@ Function OpenMenu()
 	; Option 0
 	If(BlackMarket00.IsCompleted())
 		Menu.SetPropertyIndexString("optionLabelText", 0, "Claim")
-		If(hasType0 || isClaimed || isEnslaved)
+		If(hasType0 || isClaimed || isEnslaved || !Player.HasPerk(Reaper[0]))
 			Menu.SetPropertyIndexInt("optionTextColor", 0, 0xad0909) ; dark red
 		else
 			Menu.SetPropertyIndexBool("optionEnabled", 0, true)
@@ -78,7 +74,7 @@ Function OpenMenu()
 	bool base4 = hasType0 || isEnslaved
 	If(BlackMarket00.IsCompleted())
 		Menu.SetPropertyIndexString("optionLabelText", 4, " Enslave")
-		If(base4 || ReapersMercy.availableSlots == 0)
+		If(base4 || ReapersMercy.availableSlots == 0 || !Player.HasPerk(Reaper[1]))
 			Menu.SetPropertyIndexInt("optionTextColor", 4, 0xad0909) ; dark red
 		else
 			Menu.SetPropertyIndexBool("optionEnabled", 4, true)
@@ -216,6 +212,8 @@ Spell Property healSpell Auto
 Spell Property Claimed Auto
 
 Perk Property Gnade Auto
+
+Perk[] Property Reaper Auto
 
 Keyword Property Enslaved Auto
 
