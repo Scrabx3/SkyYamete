@@ -147,7 +147,7 @@ bool Function ReaperKnockdown()
 			return false
 		EndIf
 	EndIf
-	(Quest.GetQuest("Yam_AgReapersMercy") as YamReapersMercy).AddXp(1)
+	(Quest.GetQuest("Yam_AgReapersMercy") as YamReapersMercy).AddXp(2)
 	return true
 EndFunction
 

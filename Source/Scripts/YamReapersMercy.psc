@@ -7,7 +7,10 @@ Actor Property PlayerRef Auto
 ; ================================== SETUP
 ; ======================================================================
 Event OnInit()
-	lvProgress = Math.Ceiling(Math.Pow(1.4, (0.13 * (Level.Value + 1))) + 5)
+	NextPerkReq.Value = 3 * gainedPerks + 1
+	SetLvXp()
+	UpdateCurrentInstanceGlobal(NextPerkReq)
+	UpdateCurrentInstanceGlobal(lvProgress)
 EndEvent
 
 ; ======================================================================
@@ -125,30 +128,59 @@ GlobalVariable Property Perks Auto
 GlobalVariable Property Experience Auto
 {Currently stored Experience}
 GlobalVariable Property NextPerkReq Auto
-{Required Xp to gain a new Rank}
-int gainedPerks = 0
+{Required Xp to gain a new Perk}
+int gainedPerks = 1
 ; Total Perks Gained
-int lvProgress
-; Gain 1 Xp for a Knockdown
+GlobalVariable Property lvProgress Auto
+{Required Xp for a new Level}
+; Gain 2 Xp for a Knockdown
 ; Gain 3 Xp for each sold Victim
 ; Gain 5 Xp for completed Quests
 
-; New Perk = (3 * gainedPerks + 1)
-; New Level = Math.Ceiling(Math.Pow(1.4, (0.13 * (CurLv + 1))) + 5)
+; New Perk = 3 * gainedPerks + 1
+; New Level = Math.pow((0.09 * Level.Value), 1.4) + 5.0
 Function AddXp(int e)
-	Experience.Value += e
-	lvProgress -= e
-	If(lvProgress <= 0)
-		lvProgress = Math.Ceiling(Math.Pow(1.4, (0.13 * (Level.Value + 1.0))) + 5.0) - (lvProgress * -1)
-		Level.Value += 1
-		LevelUp.Value = Level.Value
+	Experience.Value += e * 4
+	If(Level.Value < 100)
+		lvProgress.Value -= e
+		If(lvProgress.Value <= 0)
+			Level.Value += 1
+			LevelUp.Value = Level.Value
+			float leftover = Math.abs(lvProgress.Value)
+			SetLvXp()
+			lvProgress.value -= leftover
+		EndIf
 	EndIf
+	UpdateCurrentInstanceGlobal(Experience)
+	UpdateCurrentInstanceGlobal(lvProgress)
 EndFunction
 
-; Expect this to only be called when Experience >= NextPerkReq
+
 Function AddPerk()
+	If(Experience.Value < NextPerkReq.Value)
+		Debug.Notification("You don't have enough Experience to obtain a new Perk Point.")
+	EndIf
 	gainedPerks += 1
+	Perks.Value += 1
 	Experience.Value -= NextPerkReq.Value
 	NextPerkReq.Value = 3 * gainedPerks + 1
-	Perks.Value += 1
+	UpdateCurrentInstanceGlobal(Experience)
+	UpdateCurrentInstanceGlobal(NextPerkReq)
+EndFunction
+
+; Expect this to only be called when Experience >= NextLevelReq
+Function LevelUp()
+	If(Experience.Value < lvProgress.Value)
+		Debug.Notification("You don't have enough Experience to level up.")
+	EndIf
+	Level.Value += 1
+	LevelUp.Value = Level.Value
+	Experience.Value -= lvProgress.Value
+	SetLvXp()
+	UpdateCurrentInstanceGlobal(Experience)
+	UpdateCurrentInstanceGlobal(lvProgress)
+EndFunction
+
+Function SetLvXp()
+	lvProgress.Value = Math.floor(Math.pow(0.2 * Level.Value, 1.7) + 4.7)
 EndFunction
