@@ -139,8 +139,8 @@ GlobalVariable Property lvProgress Auto
 
 ; New Perk = 3 * gainedPerks + 1
 ; New Level = Math.pow((0.09 * Level.Value), 1.4) + 5.0
-Function AddXp(int e)
-	Experience.Value += e * 4
+Function AddXp(float e)
+	Experience.Value += e * 4.7
 	If(Level.Value < 100)
 		lvProgress.Value -= e
 		If(lvProgress.Value <= 0)
@@ -159,6 +159,7 @@ EndFunction
 Function AddPerk()
 	If(Experience.Value < NextPerkReq.Value)
 		Debug.Notification("You don't have enough Experience to obtain a new Perk Point.")
+		return
 	EndIf
 	gainedPerks += 1
 	Perks.Value += 1
@@ -172,6 +173,7 @@ EndFunction
 Function LevelUp()
 	If(Experience.Value < lvProgress.Value)
 		Debug.Notification("You don't have enough Experience to level up.")
+		return
 	EndIf
 	Level.Value += 1
 	LevelUp.Value = Level.Value
