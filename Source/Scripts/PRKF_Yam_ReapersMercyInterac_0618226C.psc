@@ -39,10 +39,11 @@ Function OpenMenu()
 	bool hasType0 = victim.HasMagicEffectWithKeyword(Type0)
 	bool isClaimed = victim.HasSpell(Claimed)
 	bool isEnslaved = victim.HasKeyword(Enslaved)
+	bool isHunter = BlackMarket00.GetStageDone(100)
 	; Create Menu
 	UIWheelMenu Menu = UIExtensions.GetMenu("UIWheelMenu") as UIWheelMenu
 	; Option 0
-	If(BlackMarket00.IsCompleted())
+	If(isHunter)
 		Menu.SetPropertyIndexString("optionLabelText", 0, "Claim")
 		If(hasType0 || isClaimed || isEnslaved || !Player.HasPerk(Reaper[0]))
 			Menu.SetPropertyIndexInt("optionTextColor", 0, 0xad0909) ; dark red
@@ -61,7 +62,7 @@ Function OpenMenu()
 		Menu.SetPropertyIndexBool("optionEnabled", 2, true)
 	EndIf
 	; Option 3
-	If(BlackMarket00.IsCompleted())
+	If(isHunter)
 		Menu.SetPropertyIndexString("optionLabelText", 3, "Gnade")
 		If(!Player.HasPerk(Gnade) || days > gGameDaysPassed.Value)
 			Menu.SetPropertyIndexInt("optionTextColor", 3, 0xad0909) ; dark red
@@ -72,16 +73,16 @@ Function OpenMenu()
 	EndIf
 	; Option 4
 	bool base4 = hasType0 || isEnslaved
-	If(BlackMarket00.IsCompleted())
+	If(isHunter)
 		Menu.SetPropertyIndexString("optionLabelText", 4, " Enslave")
 		If(base4 || ReapersMercy.availableSlots == 0 || !Player.HasPerk(Reaper[1]))
 			Menu.SetPropertyIndexInt("optionTextColor", 4, 0xad0909) ; dark red
 		else
 			Menu.SetPropertyIndexBool("optionEnabled", 4, true)
 		EndIf
-	Else ; If(BlackMarket00.GetStage() > 50)
+	ElseIf(BlackMarket00.GetStageDone(50))
 		Menu.SetPropertyIndexString("optionLabelText", 4, " Capture")
-		If(base4 || (BlackMarket00.GetAlias(0) as ReferenceAlias).GetReference() != none)
+		If(base4 || BMCap.GetReference() != none)
 			Menu.SetPropertyIndexInt("optionTextColor", 4, 0xad0909) ; dark red
 		else
 			Menu.SetPropertyIndexBool("optionEnabled", 4, true)
@@ -118,7 +119,7 @@ Function OpenMenu()
 				ReapersMercy.EnslaveVictim(victim)
 			EndIf
 		else
-			(BlackMarket00 as YamBlackMarket).CaptureNPC(victim, Player)
+			BMCap.CaptureNPC(victim)
 		EndIf
 	ElseIf(choice == 5) ; Assault
 		If(YamAnimationFrame.StartAnimation(MCM, victim, PapyrusUtil.ActorArray(1, Game.GetPlayer()), self, 1, "YamReaperClaimed") > -1)
@@ -224,6 +225,8 @@ Keyword Property Type0 Auto
 GlobalVariable Property gGameDaysPassed Auto
 
 Quest Property BlackMarket00 Auto
+
+YamBlackMarket00Captured Property BMCap Auto
 
 ; GlobalVariable Property AllowClaim Auto
 ;

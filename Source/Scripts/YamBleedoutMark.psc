@@ -14,7 +14,7 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 EndEvent
 
 Event OnEffectStart(Actor akTarget, Actor akCaster)
-  If(Main.MCM.bleedoutMarkImmunity && abToAdd != none && !akTarget.IsBleedingOut())
+  If(abToAdd != none && !akTarget.IsBleedingOut())
 	   akTarget.AddSpell(abToAdd)
   EndIf
 EndEvent

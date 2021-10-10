@@ -51,7 +51,7 @@ Function OpenMenu()
 		int sc = PlayerRef.HasPerk(ShadowsCaptive) as int
 		int rg = PlayerRef.HasPerk(ReapersGaze) as int
 		If(Level.Value >= 20 || ReapersMercyRank == 0)
-			Menu.AddEntryItem("Reapers Mercy (" + ReapersMercyRank + "/2)")
+			Menu.AddEntryItem("Prison of Flesh and Blood (" + ReapersMercyRank + "/2)")
 		EndIf
 		If(ReapersMercyRank > 0)
 			If(Level.Value >= (20 + AnculoRank * 20) || AnculoRank == 3)

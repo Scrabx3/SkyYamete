@@ -77,9 +77,11 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 			EndIf
 		Else ; Player Aggressor
 			bool blocked = MCM.bKdBlock[profile] && abHitBlocked && !PlayerRef.HasPerk(pPiercingStrike)
-			If(!blocked && ReaperKnockdown() && GetVulnerable(myItems))
-				GotoState("Reaper")
-				return
+			If(!blocked && ReaperKnockdown())
+			  If(GetWeakenedReaper() || GetVulnerable(myItems))
+					GotoState("Reaper")
+					return
+				EndIf
 			EndIf
     EndIf
   EndIf
@@ -140,20 +142,19 @@ bool Function ReaperKnockdown()
 		If(PlayerRef.IsInFaction(Main.baboDia) || mySelf.IsInFaction(Main.baboDia))
 			return false
 		EndIf
-	Else
-		float healthPer = mySelf.GetActorValuePercentage("Health")
-		float upper = MCM.fKdHpThreshUpper[profile] * (1 + ((5 + RM.RavageRank * 5)/100))
-	  If(healthPer > upper || healthPer < MCM.fKdHpThreshLower[profile])
-			return false
-		EndIf
 	EndIf
-	(Quest.GetQuest("Yam_AgReapersMercy") as YamReapersMercy).AddXp(2)
 	return true
 EndFunction
 
 bool Function GetWeakened()
   float healthPer = mySelf.GetActorValuePercentage("Health")
   return healthPer <= MCM.fKdHpThreshUpper[profile] && healthPer >= MCM.fKdHpThreshLower[profile]
+EndFunction
+
+bool Function GetWeakenedReaper()
+	float healthPer = mySelf.GetActorValuePercentage("Health")
+	float hpUpper = MCM.fKdHpThreshUpper[profile] * (1 + ((5 + RM.RavageRank * 5)/100))
+  return healthPer <= hpUpper && healthPer >= MCM.fKdHpThreshLower[profile]
 EndFunction
 
 bool Function GetVulnerable(Form[] wornItems)
@@ -210,6 +211,7 @@ EndFunction
 State Reaper
 	Event OnBeginState()
 		Debug.Trace("[Yamete] Enter Reaper on " + GetName())
+		(Quest.GetQuest("Yam_AgReapersMercy") as YamReapersMercy).AddXp(2)
 		If(RM.AnculoRank > 0 && Utility.RandomInt(0, 99) < (5 + RM.AnculoRank * 5))
 			RMQ.ClaimVictim(mySelf)
 		else

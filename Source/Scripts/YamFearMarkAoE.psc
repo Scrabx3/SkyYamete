@@ -8,7 +8,7 @@ Faction Property PlayerFollowerFaction Auto
 Faction Property friendFac Auto
 
 Event OnEffectStart(Actor akTarget, Actor akCaster)
-  If(akTarget != Game.GetPlayer())
+	If(akTarget != Game.GetPlayer())
 		If(akTarget.HasMagicEffectWithKeyword(bleedoutMarkTemporary))
 			Main.BleedoutExit(akTarget)
 			If(!akTarget.IsInFaction(PlayerFollowerFaction) && !akTarget.IsPlayerTeammate())
@@ -19,5 +19,5 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)
 		EndIf
 		akTarget.RemoveFromFaction(friendFac)
 		akTarget.EvaluatePackage()
-  EndIf
+	EndIf
 EndEvent

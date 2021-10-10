@@ -56,7 +56,7 @@ int Property iBlackoutChance = 15 Auto Hidden
 ; Bleedout
 string[] potionUsageList
 int Property iPotionUsage = 1 Auto Hidden
-bool Property bleedoutMarkImmunity = true Auto Hidden Conditional
+; bool Property bleedoutMarkImmunity = true Auto Hidden Conditional
 ; Rushed
 int Property iRushedConsequence = 25 Auto Hidden
 int Property iRushedConsequenceAdd = 10 Auto Hidden
@@ -443,7 +443,7 @@ Event OnPageReset(String Page)
 		AddMenuOptionST("combatScenario", "$Yam_dCombatScenario", combatScenarios[iCombatScenario])
 		AddSliderOptionST("blackoutChance", "$Yam_dBlackout", iBlackoutChance, "{0}%")
 		AddHeaderOption("$Yam_dBleedout")
-		AddToggleOptionST("dBleedImmunity", "$Yam_dBleedImmunity", bleedoutMarkImmunity)
+		; AddToggleOptionST("dBleedImmunity", "$Yam_dBleedImmunity", bleedoutMarkImmunity)
 		AddMenuOptionST("dBleedPotionMenu", "$Yam_dBleedPotionUse", potionUsageList[iPotionUsage])
 		AddHeaderOption("$Yam_dRushed")
 		AddSliderOptionST("dRushedChance", "$Yam_dRushedChance", iRushedConsequence, "{0}%", getFlag(iCombatScenario != 1))
@@ -697,9 +697,9 @@ Event OnSelectST()
 		bReaperTargets[i] = !bReaperTargets[i]
 		SetToggleOptionValueST(bReaperTargets[i])
 
-	ElseIf(option[0] == "dBleedImmunity") ; Defeat
-		bleedoutMarkImmunity = !bleedoutMarkImmunity
-		SetToggleOptionValueST(bleedoutMarkImmunity)
+	; ElseIf(option[0] == "dBleedImmunity") ; Defeat
+	; 	bleedoutMarkImmunity = !bleedoutMarkImmunity
+	; 	SetToggleOptionValueST(bleedoutMarkImmunity)
 
 	ElseIf(option[0] == "resOnlyBanditsRob") ; Resolution
 		bOnlyBanditsRob = !bOnlyBanditsRob
@@ -1994,7 +1994,7 @@ Function SavingMCM()
 	SetIntValue(filePath, "iCombatScenario", iCombatScenario)
 	SetIntValue(filePath, "iBlackoutChance", iBlackoutChance)
 	SetIntValue(filePath, "iPotionUsage", iPotionUsage)
-	SetIntValue(filePath, "bleedoutMarkImmunity", bleedoutMarkImmunity as int)
+	; SetIntValue(filePath, "bleedoutMarkImmunity", bleedoutMarkImmunity as int)
 	SetIntValue(filePath, "iRushedConsequence", iRushedConsequence)
 	SetIntValue(filePath, "iRushedConsequenceAdd", iRushedConsequenceAdd)
 	SetFloatValue(filePath, "frushedHeal", frushedHeal)
@@ -2112,7 +2112,7 @@ Function LoadingMCM()
 	iCombatScenario = GetIntValue(filePath, "iCombatScenario")
 	iBlackoutChance = GetIntValue(filePath, "iBlackoutChance")
 	iPotionUsage = GetIntValue(filePath, "iPotionUsage")
-	bleedoutMarkImmunity = GetIntValue(filePath, "bleedoutMarkImmunity") as bool
+	; bleedoutMarkImmunity = GetIntValue(filePath, "bleedoutMarkImmunity") as bool
 	iRushedConsequence = GetIntValue(filePath, "iRushedConsequence")
 	iRushedConsequenceAdd = GetIntValue(filePath, "iRushedConsequenceAdd")
 	frushedHeal = GetFloatValue(filePath, "frushedHeal")
