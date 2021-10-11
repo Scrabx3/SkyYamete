@@ -1,15 +1,11 @@
 Scriptname YamBlackMarket00Captured extends ReferenceAlias
 {Simulation of the Leash Effect on a Captured Victim}
 
-ReferenceAlias Property BMMAINcap0 Auto
 Idle Property OffsetBoundStandingStart Auto
-Spell Property CalmMark Auto
 Spell Property FleeMark Auto
 bool break
 
 Function CaptureNPC(Actor victim)
-	; victim.AddSpell(CalmMark)
-	BMMAINcap0.ForceRefTo(victim)
 	ForceRefTo(victim)
 	If(victim.GetLeveledActorBase().IsUnique())
 		victim.SetRelationshipRank(Game.GetPlayer(), -1)
@@ -47,7 +43,6 @@ Function CutLoose()
 	If(GetOwningQuest().GetStage() < 90)
 		Debug.Trace("[Yametet] BM00 -> CutLoose()")
 		FleeMark.Cast(GetReference())
-		BMMAINcap0.Clear()
 		Clear()
 		Debug.MessageBox("Your target managed to free itself and runs away.\nMake sure to always stay close to it and avoid Combat!")
 	EndIf

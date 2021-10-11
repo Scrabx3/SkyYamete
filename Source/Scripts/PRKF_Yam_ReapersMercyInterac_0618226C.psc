@@ -36,71 +36,51 @@ float days = 0.0
 
 Function OpenMenu()
 	Actor Player = Game.GetPlayer()
+	int color = 0xad0909 ; dark red
 	bool hasType0 = victim.HasMagicEffectWithKeyword(Type0)
 	bool isClaimed = victim.HasSpell(Claimed)
 	bool isEnslaved = victim.HasKeyword(Enslaved)
+	bool isProtecc = victim.HasKeyword(Protecc)
 	bool isHunter = BlackMarket00.GetStageDone(100)
-	; Create Menu
-	UIWheelMenu Menu = UIExtensions.GetMenu("UIWheelMenu") as UIWheelMenu
-	; Option 0
+	String[] label = new String[8]
 	If(isHunter)
-		Menu.SetPropertyIndexString("optionLabelText", 0, "Claim")
-		If(hasType0 || isClaimed || isEnslaved || !Player.HasPerk(Reaper[0]))
-			Menu.SetPropertyIndexInt("optionTextColor", 0, 0xad0909) ; dark red
-		else
-			Menu.SetPropertyIndexBool("optionEnabled", 0, true)
-		EndIf
-	EndIf
-	; Option 1
-	Menu.SetPropertyIndexString("optionLabelText", 1, "Open Inventory")
-	Menu.SetPropertyIndexBool("optionEnabled", 1, true)
-	; Option 2
-	Menu.SetPropertyIndexString("optionLabelText", 2, "Give Potion")
-	If(Player.GetItemCount(HealingPotions) == 0)
-		Menu.SetPropertyIndexInt("optionTextColor", 2, 0xad0909) ; dark red
+		label[0] = "Claim"
 	else
-		Menu.SetPropertyIndexBool("optionEnabled", 2, true)
+		label[0] = ""
 	EndIf
-	; Option 3
+	label[1] = "Open Inventory"
+	label[2] = "Give Potion"
+	label[3] = "Gnade"
 	If(isHunter)
-		Menu.SetPropertyIndexString("optionLabelText", 3, "Gnade")
-		If(!Player.HasPerk(Gnade) || days > gGameDaysPassed.Value)
-			Menu.SetPropertyIndexInt("optionTextColor", 3, 0xad0909) ; dark red
-		else
-			Menu.SetPropertyIndexBool("optionEnabled", 3, true)
-			days = gGameDaysPassed.Value + 0.5
-		EndIf
-	EndIf
-	; Option 4
-	bool base4 = hasType0 || isEnslaved
-	If(isHunter)
-		Menu.SetPropertyIndexString("optionLabelText", 4, " Enslave")
-		If(base4 || ReapersMercy.availableSlots == 0 || !Player.HasPerk(Reaper[1]))
-			Menu.SetPropertyIndexInt("optionTextColor", 4, 0xad0909) ; dark red
-		else
-			Menu.SetPropertyIndexBool("optionEnabled", 4, true)
-		EndIf
+		label[4] = " Enslave"
 	ElseIf(BlackMarket00.GetStageDone(50))
-		Menu.SetPropertyIndexString("optionLabelText", 4, " Capture")
-		If(base4 || BMCap.GetReference() != none)
-			Menu.SetPropertyIndexInt("optionTextColor", 4, 0xad0909) ; dark red
-		else
-			Menu.SetPropertyIndexBool("optionEnabled", 4, true)
-		EndIf
-	EndIf
-	; Option 5
-	Menu.SetPropertyIndexString("optionLabelText", 5, "Assault")
-	If(hasType0 || !victim.HasKeyword(ActorTypeNPC) && !MCM.FrameCreature)
-		Menu.SetPropertyIndexInt("optionTextColor", 5, 0xad0909) ; dark red
+		label[4] = " Capture"
 	else
-		Menu.SetPropertyIndexBool("optionEnabled", 5, true)
+		label[4] = ""
 	EndIf
-	; Option 6
-	Menu.SetPropertyIndexString("optionLabelText", 6, "Kill")
-	Menu.SetPropertyIndexBool("optionEnabled", 6, true)
-	; Option 7
-	Menu.SetPropertyIndexString("optionLabelText", 7, "Cancel")
-	Menu.SetPropertyIndexBool("optionEnabled", 7, true)
+	label[5] = "Assault"
+	label[6] = "Kill"
+	label[7] = "Cancel"
+	bool[] allow = new bool[8]
+	allow[0] = !hasType0 && !isClaimed && !isEnslaved && !isProtecc && Player.HasPerk(Reaper[0])
+	allow[1] = true
+	allow[2] = Player.GetItemCount(HealingPotions) > 0
+	allow[3] = Player.HasPerk(Gnade) && days <= gGameDaysPassed.Value
+	allow[4] = (!hasType0 && !isEnslaved && !isProtecc) && ((label[4] == " Enslave" && ReapersMercy.availableSlots > 0 && Player.HasPerk(Reaper[1])) || (label[4] == " Capture" && BMCap.GetReference() == none))
+	allow[5] = !hasType0 && (victim.HasKeyword(ActorTypeNPC) || MCM.FrameCreature)
+	allow[6] = !isProtecc
+	allow[7] = true
+	UIWheelMenu Menu = UIExtensions.GetMenu("UIWheelMenu") as UIWheelMenu
+	int i = 0
+	While(i < label.length)
+		Menu.SetPropertyIndexString("optionLabelText", i, label[i])
+		If(allow[i])
+			Menu.SetPropertyIndexBool("optionEnabled", i, true)
+		else
+			Menu.SetPropertyIndexInt("optionTextColor", i, color)
+		EndIf
+		i += 1
+	EndWhile
 
 	int choice = Menu.OpenMenu(victim)
 	If(choice == 0) ; Claim
@@ -111,6 +91,7 @@ Function OpenMenu()
 		GivePotion()
 	ElseIf(choice == 3) ; Gnade (Rescue without Potion)
 		healSpell.Cast(Player, victim)
+		days = gGameDaysPassed.Value + 0.5
 	ElseIf(choice == 4) ; Enslave/Capture
 		If(BlackMarket00.IsCompleted())
 			If(!isClaimed)
@@ -200,9 +181,7 @@ EndFunction
 
 YamMCM Property MCM Auto
 
-YamReapersMercyQst Property ReapersMercy Auto
-
-; Message Property BleedoutInterfaceMsg Auto
+YamEnslavement Property ReapersMercy Auto
 
 Message Property KillConformoation Auto
 
@@ -218,6 +197,8 @@ Perk[] Property Reaper Auto
 
 Keyword Property Enslaved Auto
 
+Keyword Property Protecc Auto
+
 Keyword Property ActorTypeNPC Auto
 
 Keyword Property Type0 Auto
@@ -227,11 +208,3 @@ GlobalVariable Property gGameDaysPassed Auto
 Quest Property BlackMarket00 Auto
 
 YamBlackMarket00Captured Property BMCap Auto
-
-; GlobalVariable Property AllowClaim Auto
-;
-; GlobalVariable Property AllowEnslave Auto
-;
-; GlobalVariable Property AllowAssault Auto
-;
-; GlobalVariable Property AllowKill Auto

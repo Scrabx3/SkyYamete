@@ -6,7 +6,7 @@ YamScan Property Scan Auto
 YamMain Property Main Auto
 YamMCM Property MCM Auto
 YamReapersMercy Property RM Auto
-YamReapersMercyQst Property RMQ Auto
+YamEnslavement Property RMQ Auto
 Actor Property PlayerRef Auto
 Spell Property calmMark Auto
 Spell Property CacheGear Auto
@@ -211,7 +211,7 @@ EndFunction
 State Reaper
 	Event OnBeginState()
 		Debug.Trace("[Yamete] Enter Reaper on " + GetName())
-		(Quest.GetQuest("Yam_AgReapersMercy") as YamReapersMercy).AddXp(2)
+		RM.AddXp(2)
 		If(RM.AnculoRank > 0 && Utility.RandomInt(0, 99) < (5 + RM.AnculoRank * 5))
 			RMQ.ClaimVictim(mySelf)
 		else

@@ -3,10 +3,10 @@ Scriptname YamReapersMercyApply extends ActiveMagicEffect
 
 ; ----------------------- Property
 YamReapersMercy Property RM Auto
-YamReapersMercyQst Property SQ Auto
+YamEnslavement Property SQ Auto
 YamMain Property Main Auto
 Actor Property PlayerRef Auto
-; ----------------------- Code
+;/ ----------------------- Code
 State Busy
 	Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile, bool abPowerAttack, bool abSneakAttack, bool abBashAttack, bool abHitBlocked)
 		;
@@ -46,3 +46,4 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 	Utility.Wait(0.1)
 	GotoState("")
 EndEvent
+/;

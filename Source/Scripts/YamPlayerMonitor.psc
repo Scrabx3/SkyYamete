@@ -7,7 +7,7 @@ int resiliance
 Event OnInit()
   mySelf = PlayerRef
   consequenceChance = MCM.iRushedConsequence
-  profile = MCM.iPlayerKDProfile
+  profile = 0
   Aggressor = none
 	DefineResiliance()
   ; RegisterForModEvent("Yam_CombatStop", "CombatStop")

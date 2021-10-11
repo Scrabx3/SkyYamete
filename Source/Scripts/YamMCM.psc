@@ -13,7 +13,8 @@ Spell Property ExclusionSpell Auto
 Faction Property exclusionFac Auto
 ; -------------------------- Variables
 bool firstCall = true
-string filePath = "../Yamete/MCM.json"
+string filePathNull = "../Yamete/Default.json"
+string filePath00 = "../Yamete/MCM.json"
 ; --- General
 ; Combat Quest
 int Property iClockOutChance = 100 Auto Hidden
@@ -90,11 +91,7 @@ int Property iResNPCendless = 0 Auto Hidden
 
 ; --- Condition
 string[] KnockdownProfile
-int iKDProfile = 0
-int Property iPlayerKDProfile = 0 Auto Hidden
-int Property iReaperKDProfile = 0 Auto Hidden
-int Property iFollowerKDProfile = 0 Auto Hidden
-int Property iNPCKDProfile = 0 Auto Hidden
+int Property iKDProfile = 0 Auto Hidden
 ; Generic
 float[] Property fKDChance Auto Hidden
 bool[] Property bKdBlock Auto Hidden
@@ -309,10 +306,9 @@ Function Initialize()
 
 	; Knockdown Profile
 	KnockdownProfile = new string[3]
-	KnockdownProfile[0] = "$Yam_KdProfileScorpion"
-	KnockdownProfile[1] = "$Yam_KdProfileSpider"
-	KnockdownProfile[2] = "$Yam_KdProfileTermite"
-	; KnockdownProfile[3] = "$Yam_KdProfileCentipede"
+	KnockdownProfile[0] = "$Yam_KdProfilePlayer" ; Player
+	KnockdownProfile[1] = "$Yam_KdProfileFollower" ; Follower
+	KnockdownProfile[2] = "$Yam_KdProfileNPC" ; NPC/Creature
 
 	; --- Filter
 	FilterTypeList = new string[2]
@@ -345,21 +341,21 @@ Function startMod(bool loadMCM)
 	bKdStripDrop = CreateBoolArray(KnockdownProfile.length, false)
 	iKdStripDstry = CreateIntArray(KnockdownProfile.length, 20)
 	bValidStrips = CreateBoolArray(32)
-	SLTags = CreateStringArray(10)
+	SLTags = CreateStringArray(11)
 	strippingRestoreDefaults()
 	SLTags[1] = "ff"
 	SLTags[2] = "femdom"
 	SLTags[3] = "mm"
 	WaitMenuMode(0.2)
 	If(loadMCM)
-		LoadingMCM()
+		LoadingMCM(filePath00)
 	EndIf
 	bModPaused = false
 EndFunction
 
 Event OnConfigClose()
 	If(AutoSaveMCM)
-		SavingMCM()
+		SavingMCM(filePath00)
 	EndIf
 	; Force Shutdown the Combat Quest
 	If(bKillScanQuest)
@@ -429,7 +425,6 @@ Event OnPageReset(String Page)
 		SetCursorPosition(1)
 		AddHeaderOption("$Yam_reaperPerks")
 		AddToggleOptionST("ReaperSkilltree", "$Yam_reaperSkilltree", bNoSkilltree)
-		; AddMenuOptionST("ReaperKDProfile", "$Yam_KdProfileReaper", KnockdownProfile[iReaperKDProfile])
 		; AddHeaderOption("$Yam_reaperValidTargets")
 		; AddMenuOptionST("reaperFolTreatment", "$Yam_reaperFolTreatment", reaperFollowerTreat[iReaperFollower])
 		; int i = 0
@@ -452,7 +447,7 @@ Event OnPageReset(String Page)
 		AddSliderOptionST("dRushedBuffer", "$Yam_dRushedBuffer", iRushedBuffer, "{0}s", getFlag(iCombatScenario != 1))
 		AddHeaderOption("$Yam_dBleedTypes")
 		AddSliderOptionST("dBleedRegularPl", "$Yam_dBleedRegPl", iBleedRegularPl)
-		AddSliderOptionST("dBleedWitherPl", "$Yam_dBleedWitherPl", iBleedWitheredPl)
+		; AddSliderOptionST("dBleedWitherPl", "$Yam_dBleedWitherPl", iBleedWitheredPl)
 		AddSliderOptionST("dBleedDeathSentPl", "$Yam_dBleedDeathSentPl", iBleedDeathSentencePl)
 		AddEmptyOption()
 		AddSliderOptionST("dBleedRegular", "$Yam_dBleedRegNPC", iBleedRegular)
@@ -479,17 +474,10 @@ Event OnPageReset(String Page)
 		AddSliderOptionST("resRapeEndless", "$Yam_resRapeEndless", iResNPCendless, "{0}%")
 
 	ElseIf(Page == "$Yam_pConditions")
-		AddMenuOptionST("PlayerKDProfile", "$Yam_KdProfilePlayer", KnockdownProfile[iPlayerKDProfile])
-		; AddMenuOptionST("ReaperKDProfile", "$Yam_KdProfileReaper", KnockdownProfile[iReaperKDProfile])
-		AddEmptyOption()
-		AddHeaderOption("")
 		AddMenuOptionST("KDProfileViewer", "$Yam_KdProfileCurrent", KnockdownProfile[iKDProfile])
 		SetCursorPosition(1)
-		AddMenuOptionST("FollowerKDProfile", "$Yam_KdProfileFollower", KnockdownProfile[iFollowerKDProfile])
-		AddMenuOptionST("NPCKDProfile", "$Yam_KdProfileNPC", KnockdownProfile[iNPCKDProfile])
-		AddHeaderOption("")
 		AddTextOptionST("KDreadMe", "$Yam_rReadMe", none)
-		SetCursorPosition(8)
+		SetCursorPosition(2)
 		int i = iKDProfile
 		; ================= Default
 		AddHeaderOption("$Yam_KdProfileHeader4")
@@ -656,6 +644,7 @@ Event OnPageReset(String Page)
 		SetCursorPosition(1)
 		AddHeaderOption("$Yam_debugPreset")
 		AddToggleOptionST("AutoSaveMCM", "$Yam_debugAutoSaveMCM", AutoSaveMCM)
+		AddTextOptionST("LoadMCMNull", "$Yam_debugPresetLoadNull", none)
 		AddTextOptionST("LoadMCM", "$Yam_debugPresetLoad", none)
 		AddTextOptionST("SaveMCM", "$Yam_debugPresetSave", none)
 		AddEmptyOption()
@@ -1569,82 +1558,6 @@ endState
 ; ===============================================================
 ; =============================	KNOCKDOWN CONDITION
 ; ===============================================================
-State PlayerKDProfile
-	Event OnMenuOpenST()
-		SetMenuDialogStartIndex(iPlayerKDProfile)
-		SetMenuDialogDefaultIndex(1)
-		SetMenuDialogOptions(KnockdownProfile)
-	EndEvent
-	Event OnMenuAcceptST(int index)
-		iPlayerKDProfile = index
-		SetMenuOptionValueST(KnockdownProfile[iPlayerKDProfile])
-	EndEvent
-	Event OnDefaultST()
-		iPlayerKDProfile = 1
-		SetMenuOptionValueST(KnockdownProfile[iPlayerKDProfile])
-	EndEvent
-	Event OnHighlightST()
-		SetInfoText("$Yam_KdProfilePlayerHighlight")
-	endEvent
-EndState
-
-State ReaperKDProfile
-	Event OnMenuOpenST()
-		SetMenuDialogStartIndex(iReaperKDProfile)
-		SetMenuDialogDefaultIndex(1)
-		SetMenuDialogOptions(KnockdownProfile)
-	EndEvent
-	Event OnMenuAcceptST(int index)
-		iReaperKDProfile = index
-		SetMenuOptionValueST(KnockdownProfile[iReaperKDProfile])
-	EndEvent
-	Event OnDefaultST()
-		iReaperKDProfile = 1
-		SetMenuOptionValueST(KnockdownProfile[iReaperKDProfile])
-	EndEvent
-	Event OnHighlightST()
-		SetInfoText("$Yam_KdProfileReaperHighlight")
-	endEvent
-EndState
-
-State FollowerKDProfile
-	Event OnMenuOpenST()
-		SetMenuDialogStartIndex(iFollowerKDProfile)
-		SetMenuDialogDefaultIndex(1)
-		SetMenuDialogOptions(KnockdownProfile)
-	EndEvent
-	Event OnMenuAcceptST(int index)
-		iFollowerKDProfile = index
-		SetMenuOptionValueST(KnockdownProfile[iFollowerKDProfile])
-	EndEvent
-	Event OnDefaultST()
-		iFollowerKDProfile = 1
-		SetMenuOptionValueST(KnockdownProfile[iFollowerKDProfile])
-	EndEvent
-	Event OnHighlightST()
-		SetInfoText("$Yam_KdProfileFollowerHighlight")
-	endEvent
-EndState
-
-State NPCKDProfile
-	Event OnMenuOpenST()
-		SetMenuDialogStartIndex(iNPCKDProfile)
-		SetMenuDialogDefaultIndex(1)
-		SetMenuDialogOptions(KnockdownProfile)
-	EndEvent
-	Event OnMenuAcceptST(int index)
-		iNPCKDProfile = index
-		SetMenuOptionValueST(KnockdownProfile[iNPCKDProfile])
-	EndEvent
-	Event OnDefaultST()
-		iNPCKDProfile = 1
-		SetMenuOptionValueST(KnockdownProfile[iNPCKDProfile])
-	EndEvent
-	Event OnHighlightST()
-		SetInfoText("$Yam_KdProfileNPCHighlight")
-	endEvent
-EndState
-
 State KDProfileViewer
 	Event OnMenuOpenST()
 		SetMenuDialogStartIndex(iKDProfile)
@@ -1811,11 +1724,22 @@ State SLScenery
 		EndEvent
 EndState
 ; Presets
+State LoadMCMNull
+	Event OnSelectST()
+		If(ShowMessage("$Yam_debugPresetLoadNullSure"))
+			SetTextOptionValueST("$Yam_working")
+			LoadingMCM(filePathNull)
+			WaitMenuMode(1)
+			SetTextOptionValueST("$Yam_done")
+		EndIf
+	EndEvent
+EndState
+
 State LoadMCM
 	Event OnSelectST()
 		If(ShowMessage("$Yam_debugPresetLoadSure"))
 			SetTextOptionValueST("$Yam_working")
-			LoadingMCM()
+			LoadingMCM(filePath00)
 			WaitMenuMode(1)
 			SetTextOptionValueST("$Yam_done")
 		EndIf
@@ -1826,7 +1750,7 @@ State SaveMCM
 	Event OnSelectST()
 		If(ShowMessage("$Yam_debugPresetSaveSure"))
 			SetTextOptionValueST("$Yam_working")
-			SavingMCM()
+			SavingMCM(filePath00)
 			WaitMenuMode(1)
 			SetTextOptionValueST("$Yam_done")
 		EndIf
@@ -1970,7 +1894,7 @@ int Function validateExcludedVictims()
 	return 3
 EndFunction
 
-Function SavingMCM()
+Function SavingMCM(String filepath)
 	; --- General
 	SetIntValue(filePath, "ClockOutChance", iClockOutChance)
 	SetIntValue(filePath, "bCheckHostility", bCheckHostility as int)
@@ -2021,9 +1945,6 @@ Function SavingMCM()
 	SetIntValue(filePath, "iResNPCendless", iResNPCendless)
 
 	; --- Knockdown Condition
-	SetIntValue(filePath, "iPlayerKDProfile", iPlayerKDProfile)
-	SetIntValue(filePath, "iFollowerKDProfile", iFollowerKDProfile)
-	SetIntValue(filePath, "iNPCKDProfile", iNPCKDProfile)
 	FloatListCopy(filePath, "fKDChance", fKDChance)
 	IntListCopy(filePath, "bKdBlock", boolToIntArray(bKdBlock))
 	IntListCopy(filePath, "bKdMelee", boolToIntArray(bKdMelee))
@@ -2085,7 +2006,7 @@ Function SavingMCM()
 	Save(filepath)
 EndFunction
 
-Function LoadingMCM()
+Function LoadingMCM(String filepath)
 	If(IsGood(filePath) == false || JsonExists(filePath) == false)
 		Debug.Messagebox("[Error] MCM Preset has errors or doesn't exist")
 		return
@@ -2139,9 +2060,6 @@ Function LoadingMCM()
 	iResNPCendless = GetIntValue(filePath, "iResNPCendless")
 
 	; --- Knockdown Condition
-	iPlayerKDProfile = GetIntValue(filePath, "iPlayerKDProfile")
-	iFollowerKDProfile = GetIntValue(filePath, "iFollowerKDProfile")
-	iNPCKDProfile = GetIntValue(filePath, "iNPCKDProfile")
 	fKDChance = FloatListToArray(filePath, "fKDChance")
 	bKdBlock = intToBoolArray(IntListToArray(filePath, "bKdBlock"))
 	bKdMelee = intToBoolArray(IntListToArray(filePath, "bKdMelee"))

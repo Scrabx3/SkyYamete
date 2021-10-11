@@ -101,6 +101,8 @@ Function Fragment_15()
 ;BEGIN CODE
 ; Scene finished, Charon announced the Player a Hunter
 Game.GetPlayer().AddItem(Gold001, 300)
+BlackMarket.AddXp(7)
+
 CompleteAllObjectives()
 entranceColli.DisableNoWait()
 colliWallAgent.EnableNoWait()

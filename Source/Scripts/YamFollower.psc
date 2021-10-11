@@ -7,7 +7,7 @@ Event OnInit()
 		mySelf.AddSpell(CacheGear)
   EndIf
   consequenceChance = MCM.iRushedConsequence
-  profile = MCM.iFollowerKDProfile
+  profile = 1
   Aggressor = none
   ; RegisterForModEvent("Yam_CombatStop", "CombatStop")
 EndEvent

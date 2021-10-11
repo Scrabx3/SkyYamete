@@ -1,6 +1,6 @@
 Scriptname YamLurkingThreat extends ActiveMagicEffect
 
-YamReapersMercyQst Property RMQ Auto
+YamEnslavement Property RMQ Auto
 YamReapersMercy Property RM Auto
 
 Event OnEffectStart(Actor akTarget, Actor akCaster)

@@ -1,6 +1,6 @@
 Scriptname YamReapersGaze extends ActiveMagicEffect
 
-YamReapersMercyQst Property RM Auto
+YamEnslavement Property RM Auto
 Keyword Property Protecc Auto
 
 Event OnEffectStart(Actor akTarget, Actor akCaster)

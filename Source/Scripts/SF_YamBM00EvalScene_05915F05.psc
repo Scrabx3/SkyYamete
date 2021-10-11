@@ -11,15 +11,6 @@ CageDoor.Lock(true, true)
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_3
-Function Fragment_3()
-;BEGIN CODE
-Captured.Clear()
-Game.EnablePlayerControls()
-;END CODE
-EndFunction
-;END FRAGMENT
-
 ;BEGIN FRAGMENT Fragment_2
 Function Fragment_2()
 ;BEGIN CODE
@@ -36,8 +27,20 @@ CageDoor.SetOpen(true)
 EndFunction
 ;END FRAGMENT
 
+;BEGIN FRAGMENT Fragment_3
+Function Fragment_3()
+;BEGIN CODE
+Captured.GetActorReference().AddSpell(StayCage)
+Game.EnablePlayerControls()
+Captured.Clear()
+;END CODE
+EndFunction
+;END FRAGMENT
+
 ;END FRAGMENT CODE - Do not edit anything between this and the begin comment
 
 ObjectReference Property CageDoor  Auto
 
 YamBlackMarket00Captured Property Captured  Auto
+
+SPELL Property StayCage  Auto  

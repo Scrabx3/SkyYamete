@@ -1,6 +1,6 @@
 Scriptname YamMain extends Quest
 {Main  Script, handles most basic utility functionality and is responsible for starting the Combat Quest}
-; -------------------------- Properties
+
 YamMCM Property MCM Auto
 Actor Property PlayerRef Auto
 FormList Property Yam_FriendList Auto
@@ -28,7 +28,27 @@ bool Property ModPaused = true Auto Hidden
 string filePath = "../Yamete/excluded.json"
 int ignoredSlots = 0x8070862
 Faction Property baboDia Auto Hidden
-; -------------------------- Adult Frames
+
+; -------------------------- Globals
+bool Function EquipCachedOutfit(Actor target) global
+	Debug.Trace("[Yamete] EquipCachedOutfit called for " + target)
+	string storageID = "YamOutfit" + target.GetFormID()
+	int numItems = StorageUtil.FormListCount(target, storageID)
+	bool ret = false
+	If(numItems > 0)
+		While(numItems > 0)
+			numItems -= 1
+			Form item = StorageUtil.FormListPop(target, storageID)
+			If(target.GetItemCount(item) > 0)
+				target.EquipItem(item)
+			EndIf
+		EndWhile
+		ret = true
+	EndIf
+	StorageUtil.FileFormListClear(storageID)
+	return ret
+EndFunction
+
 ; ======================================================================
 ; ================================== STARTUP
 ; ======================================================================
@@ -53,13 +73,14 @@ Function Maintenance()
   If(!ostimhere)
     MCM.bOStimAllowed = false
   EndIf
-  ; Hostile Faction & UILib
+  ; Hostile Faction
   int i = Yam_FriendList.GetSize()
   While(i)
     i -= 1
     Faction tmpFac = Yam_FriendList.GetAt(i) as Faction
     tmpFac.SetAlly(Yam_FriendFaction, true, true)
   EndWhile
+	;/ TODO Remove this /;
   If(Game.GetModByName("BaboInteractiveDia.esp") != 255)
     baboDia = (Game.GetFormFromFile(0xD58522, "BaboInteractiveDia.esp") as Faction)
   else
@@ -141,7 +162,7 @@ int Function npcBleedout(Actor akVictim, int consequence)
     EndIf
   EndIf
   ; Start Consequence
-  Debug.Trace("[Yamete] " + akVictim.GetLeveledActorBase().GetName() + " Entering Bleedout Type " + consequence)
+  Debug.Trace("[Yamete] " + akVictim + " Entering Bleedout Type " + consequence)
   BleedOutEnter(akVictim, consequence)
   return consequence
 EndFunction
@@ -336,7 +357,6 @@ int Function GetActorType(Actor me)
   EndIf
 endFunction
 
-
 bool Function isValidGenderCombination(Actor akVictim, Actor akAggressor)
 	int agrGender = GetActorType(akAggressor)
   If(akVictim != PlayerRef)
@@ -469,26 +489,6 @@ Function playKillmove(Actor killer, Actor victim)
   If(killer == Game.GetPlayer())
     Game.SetPlayerAIDriven(false)
   EndIf
-EndFunction
-
-
-bool Function EquipCachedOutfit(Actor target) global
-	Debug.Trace("[Yamete] EquipCachedOutfit called for " + target)
-	string storageID = "YamOutfit" + target.GetFormID()
-	int numItems = StorageUtil.FormListCount(target, storageID)
-	bool ret = false
-	If(numItems > 0)
-		While(numItems > 0)
-			Form item = StorageUtil.FormListPop(target, storageID)
-			If(target.GetItemCount(item) > 0)
-				target.EquipItem(item)
-			EndIf
-			numItems -= 1
-		EndWhile
-		ret = true
-	EndIf
-	StorageUtil.FileFormListClear(storageID)
-	return ret
 EndFunction
 ; ======================================================================
 ; ================================== GENERIC RESOLUTION

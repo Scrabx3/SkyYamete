@@ -6,7 +6,7 @@ Scriptname TIF_Yam_0568D28A Extends TopicInfo Hidden
 Function Fragment_0(ObjectReference akSpeakerRef)
 Actor akSpeaker = akSpeakerRef as Actor
 ;BEGIN CODE
-(GetOwningQuest() as YamReapersMercyQst).SetOutfit(akSpeaker)
+(GetOwningQuest() as YamEnslavement).SetOutfit(akSpeaker)
 ;END CODE
 EndFunction
 ;END FRAGMENT

@@ -1,7 +1,7 @@
 Scriptname YamShadowsCaptive extends ActiveMagicEffect
 {Set the Target essential for 2 seconds if the Player has the Shadows Captive Perk & this attack is a Stealth Attack}
 
-YamReapersMercyQst Property RMQ Auto
+YamEnslavement Property RMQ Auto
 
 Event OnEffectStart(Actor akTarget, Actor akCaster)
 	Debug.MessageBox("Shadows Captive applied")

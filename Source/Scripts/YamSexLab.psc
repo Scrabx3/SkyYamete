@@ -86,9 +86,9 @@ int Function StartAnimation(YamMCM MCM, Actor first, Actor[] others, int asVicti
   int fg = SL.GetGender(first)
   sslBaseAnimation[] anims
 	bool breakLoop = false
-	While(!breakLoop && others.length > 1)
+	While(!breakLoop)
 		If(fg > 1) ; Creature
-	    anims = SL.PickAnimationsByActors(others)
+	    anims = SL.GetAnimationsByTags(others.length, MCM.SLTags[10])
 	  ElseIf(others.length == 2)
 	    int males = SL.MaleCount(others)
 	    If(fg == 1 && males > 0) ; Female first & Male Partner
@@ -101,6 +101,8 @@ int Function StartAnimation(YamMCM MCM, Actor first, Actor[] others, int asVicti
 	  EndIf
 		If(anims)
 			breakLoop = true
+		ElseIf(others.length < 2)
+			return -1
 		else
 			others = PapyrusUtil.RemoveActor(others, others[0])
 		EndIf
