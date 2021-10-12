@@ -357,18 +357,45 @@ int Function GetActorType(Actor me)
   EndIf
 endFunction
 
+; ollowerAttac[0] = "$Yam_folAttac_0" ; Nobody
+; FollowerAttac[1] = "$Yam_folAttac_1" ; Anyone
+; FollowerAttac[2] = "$Yam_folAttac_2" ; Only NPC
+
+;	NPCAttac[0] = "$Yam_npcAttac_0" ; Nobody
+;	NPCAttac[1] = "$Yam_NPCAttac_1" ; Anyone
+;	NPCAttac[2] = "$Yam_npcAttac_2" ; Only NPC
+;	NPCAttac[3] = "$Yam_npcAttac_3" ; Only Follower
+;	NPCAttac[4] = "$Yam_npcAttac_4" ; Only Player
+;	NPCAttac[5] = "$Yam_npcAttac_5" ; Only Player Team
+
+
 bool Function isValidGenderCombination(Actor akVictim, Actor akAggressor)
+  bool isFolA = akAggressor.IsInFaction(PlayerFollowerFaction) || akAggressor.IsPlayerTeammate()
+  bool isFolV = akVictim.IsInFaction(PlayerFollowerFaction) || akVictim.IsPlayerTeammate()
+  bool plVic = akVictim == PlayerRef
+  If (isFolA && (MCM.iFolAttac == 0 || MCM.iFolAttac == 2 && isFolV))
+    return false
+  ElseIf (!isFolA && MCM.iNPCAttac != 1)
+    If (MCM.iNPCAttac == 0)
+      return false
+    ElseIf (plVic)
+      If (MCM.iNPCAttac < 4)
+        return false
+      EndIf
+    ElseIf (isFolV && MCM.iNPCAttac != 3 && MCM.iNPCAttac != 5 || !isFolV && MCM.iNPCAttac != 2)
+      return false
+    EndIf
+  EndIf
 	int agrGender = GetActorType(akAggressor)
-  If(akVictim != PlayerRef)
+  If(plVic)
     int vicGender = GetActorType(akVictim)
-		If(akVictim.IsInFaction(PlayerFollowerFaction) || akVictim.IsPlayerTeammate())
+		If(isFolV)
 			return MCM.bAssaultFol[vicGender * 5 + agrGender]
 		else ; Victim NPC
-			bool allowInt = akAggressor.IsInFaction(PlayerFollowerFaction) || akAggressor.IsPlayerTeammate() || MCM.bAssaultNpcNpc
-			return MCM.bAssaultNPC[vicGender * 5 + agrGender] && allowInt
+			return MCM.bAssaultNPC[vicGender * 5 + agrGender]
 		EndIf
   else
-    return MCM.bAssaultPl[agrGender] && (!akAggressor.IsInFaction(PlayerFollowerFaction) && !akAggressor.IsPlayerTeammate() || MCM.bAssaultFolPl)
+    return MCM.bAssaultPl[agrGender] && (!akAggressor.IsInFaction(PlayerFollowerFaction) && !akAggressor.IsPlayerTeammate())
   EndIf
 EndFunction
 

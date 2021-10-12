@@ -1,1 +1,4 @@
+.vscode/*
 .build-papyrus.yml
+*.ppj
+*.code-workspace

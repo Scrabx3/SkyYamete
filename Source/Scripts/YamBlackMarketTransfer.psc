@@ -3,9 +3,10 @@ Scriptname YamBlackMarketTransfer extends ActiveMagicEffect
 
 ObjectReference Property OutofBound Auto ; Apparently NPC can headtrack disabled Actors which is kinda awkard
 
-Event OnCellDetach()
+Event OnUnload()
 	Actor me = GetTargetActor()
 	me.MoveTo(OutofBound)
 	me.KillEssential()
 	me.Disable()
 EndEvent
+

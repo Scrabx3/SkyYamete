@@ -12,6 +12,7 @@ Spell Property ReapersMercySpell Auto
 Spell Property ExclusionSpell Auto
 Faction Property exclusionFac Auto
 ; -------------------------- Variables
+String[] classColors
 bool firstCall = true
 string filePathNull = "../Yamete/Default.json"
 string filePath00 = "../Yamete/MCM.json"
@@ -41,7 +42,7 @@ string[] reaperFollowerTreat
 int Property iPlAggrKey = -1 Auto Hidden
 ;
 bool Property bOnlyWithReaper = true Auto Hidden
-;	Perks
+; Perks
 bool Property bNoSkilltree = false Auto Hidden
 
 
@@ -155,10 +156,11 @@ EndProperty
 
 ; --- Filter
 string[] FilterTypeList
+string[] FollowerAttac
+string[] NPCAttac
 int Property iFilterType = 1 Auto Hidden
-; 0 - Selective // 1 - Restrictive
-bool Property bAssaultFolPl = false Auto Hidden
-bool Property bAssaultNpcNpc = true Auto Hidden
+int Property iFolAttac = 1 Auto Hidden
+int Property iNPCAttac = 1 Auto Hidden
 bool[] Property bAssaultPl Auto
 bool[] Property bAssaultNPC Auto
 bool[] Property bAssaultFol Auto
@@ -265,7 +267,7 @@ endEvent
 Function Initialize()
 	Pages = new string[10]
 	Pages[0] = "$Yam_pGeneral"
-  Pages[1] = "$Yam_pReaper"
+	Pages[1] = "$Yam_pReaper"
 	Pages[2] = "$Yam_pDefeat"
 	Pages[3] = "$Yam_pConditions"
 	Pages[4] = "$Yam_pStripping"
@@ -274,6 +276,12 @@ Function Initialize()
 	Pages[7] = "$Yam_pCreatureFilter"
 	Pages[8] = "$Yam_pConsequences"
 	Pages[9] = "$Yam_pDebug"
+
+	; Colors
+	classColors = new String[3]
+	classColors[0] = "<font color = '#ffff00'>" ; Player - Yellow
+	classColors[1] = "<font color = '#00c707'>" ; Follower - Green
+	classColors[2] = "<font color = '#f536ff'>"	; NPC - Magnetta
 
 	; General
 	importanceOptions = new string[3]
@@ -314,6 +322,19 @@ Function Initialize()
 	FilterTypeList = new string[2]
 	FilterTypeList[0] = "$Yam_filterType_0" ; Selective
 	FilterTypeList[1] = "$Yam_filterType_1" ; Restrictive
+
+	FollowerAttac = new String[3]
+	FollowerAttac[0] = "$Yam_folAttac_0" ; Nobody
+	FollowerAttac[1] = "$Yam_folAttac_1" ; Anyone
+	FollowerAttac[2] = "$Yam_folAttac_2" ; Only NPC
+
+	NPCAttac = new String[6]
+	NPCAttac[0] = "$Yam_npcAttac_0" ; Nobody
+	NPCAttac[1] = "$Yam_NPCAttac_1" ; Anyone
+	NPCAttac[2] = "$Yam_npcAttac_2" ; Only NPC
+	NPCAttac[3] = "$Yam_npcAttac_3" ; Only Follower
+	NPCAttac[4] = "$Yam_npcAttac_4" ; Only Player
+	NPCAttac[5] = "$Yam_npcAttac_5" ; Only Player Team
 
 	; --- Creature Filter
 	crtFilterMethodList = new string[4]
@@ -480,24 +501,24 @@ Event OnPageReset(String Page)
 		SetCursorPosition(2)
 		int i = iKDProfile
 		; ================= Default
-		AddHeaderOption("$Yam_KdProfileHeader4")
+		AddHeaderOption(classColors[i] + "$Yam_KdProfileHeader4")
 		AddSliderOptionST("KdChance_" + i, "$Yam_KdProfileChance", fKDChance[i], "{1}%")
 		AddToggleOptionST("KdBlock_" + i, "$Yam_KdProfileUnblocked", bKdBlock[i])
 		AddToggleOptionST("KdMelee_" + i, "$Yam_KdProfileMelee", bKdMelee[i])
 		; ================= Weakened
-		AddHeaderOption("$Yam_KdProfileHeader0")
+		AddHeaderOption(classColors[i] + "$Yam_KdProfileHeader0")
 		AddSliderOptionST("KDHpThreshUp_" + i, "$Yam_KdProfileHPThreshUpper", fKdHpThreshUpper[i] * 100, "{0}%")
 		AddSliderOptionST("KDHpThreshLow_" + i, "$Yam_KdProfileHPThreshLower", fKdHpThreshLower[i] * 100, "{0}%")
 		; ================= Vulnerable
-		AddHeaderOption("$Yam_KdProfileHeader1")
+		AddHeaderOption(classColors[i] + "$Yam_KdProfileHeader1")
 		AddSliderOptionST("KdVulnerable_" + i, "$Yam_KdProfileVulnerable", iKdVulnerable[i], "{0}")
-		SetCursorPosition(9)
+		SetCursorPosition(3)
 		; ================= Essential
-		AddHeaderOption("$Yam_KdProfileHeader3")
+		AddHeaderOption(classColors[i] + "$Yam_KdProfileHeader3")
 		AddToggleOptionST("KdEssentialPlayer", "$Yam_KdEssentialPl", bKdEssentialPlayer)
 		AddToggleOptionST("KdEssentialNPC_" + i, "$Yam_KdEssentialNPC", bKdEssentialNPC[i])
 		; ================= Stripping
-		AddHeaderOption("$Yam_KdProfileHeader2")
+		AddHeaderOption(classColors[i] + "$Yam_KdProfileHeader2")
 		AddSliderOptionST("KdStripOdds_" + i, "$Yam_KdStripOdds", iKdStrip[i], "{0}%")
 		AddToggleOptionST("KdStripBlock_" + i, "$Yam_KdStripBlock", bKdStripBlock[i], getFlag(iKdStrip[i] > 0))
 		AddToggleOptionST("KdStripDrop_" + i, "$Yam_KdStripDrop", bKdStripDrop[i], getFlag(iKdStrip[i] > 0))
@@ -571,8 +592,8 @@ Event OnPageReset(String Page)
 		;/ Male > Female (> Futa) > Creature (> Fem. Creature) /;
 		AddMenuOptionST("filterType", "$Yam_filterType", FilterTypeList[iFilterType])
 		AddEmptyOption()
-		AddToggleOptionST("filterFolPl", "$Yam_filterFolPl", bAssaultFolPl)
-		AddToggleOptionST("filterNpcNpc", "$Yam_filterNpcNpc", bAssaultNpcNpc)
+		AddMenuOptionST("filterFol", "$Yam_folAttac", FollowerAttac[iFolAttac])
+		AddMenuOptionST("filterNPC", "$Yam_npcAttac", NPCAttac[iNPCAttac])
 		If(bSupportFilter == true)
 			AddEmptyOption()
 			AddEmptyOption()
@@ -580,7 +601,7 @@ Event OnPageReset(String Page)
 		int i = 0
 		While(i < 5)
 			If((i != 2 && i != 4) || bSupportFilter == true)
-				AddHeaderOption("<font color = '#f536ff'>$Yam_filterClasses_" + i)
+				AddHeaderOption(classColors[2] + "$Yam_filterClasses_" + i)
 				int n = 0
 				While(n < 5)
 					If((n != 2 && n != 4) || bSupportFilter == true)
@@ -593,7 +614,7 @@ Event OnPageReset(String Page)
 			i += 1
 		EndWhile
 		SetCursorPosition(1)
-		AddHeaderOption("<font color = '#ffff00'>$Yam_mPlayer")
+		AddHeaderOption(classColors[0] + "$Yam_mPlayer")
 		i = 0
 		While(i < 5)
 			If(i != 2 && i != 4 || bSupportFilter == true)
@@ -604,7 +625,7 @@ Event OnPageReset(String Page)
 		i = 0
 		While(i < 5)
 			If((i != 2 && i != 4) || bSupportFilter == true)
-				AddHeaderOption("<font color = '#00c707'>$Yam_filterClassesFol_" + i)
+				AddHeaderOption(classColors[1] + "$Yam_filterClassesFol_" + i)
 				int n = 0
 				While(n < 5)
 					If((n != 2 && n != 4) || bSupportFilter == true)
@@ -719,12 +740,6 @@ Event OnSelectST()
 		int i = option[1] as int
 		bAssaultFol[i] = !bAssaultFol[i]
 		SetToggleOptionValueST(bAssaultFol[i])
-	ElseIf(option[0] == "filterFolPl")
-		bAssaultFolPl = !bAssaultFolPl
-		SetToggleOptionValueST(bAssaultFolPl)
-	ElseIf(option[0] == "filterNpcNpc")
-		bAssaultNpcNpc = !bAssaultNpcNpc
-		SetToggleOptionValueST(bAssaultNpcNpc)
 
 
 	ElseIf(option[0] == "creatureFilter") ; Creature Filter
@@ -1194,6 +1209,14 @@ Event OnMenuOpenST()
 		SetMenuDialogStartIndex(iFilterType)
 		SetMenuDialogDefaultIndex(1)
 		SetMenuDialogOptions(FilterTypeList)
+	ElseIf(option[0] == "filterFol")
+		SetMenuDialogStartIndex(iFolAttac)
+		SetMenuDialogDefaultIndex(1)
+		SetMenuDialogOptions(FollowerAttac)
+	ElseIf(option[0] == "filterNPC")
+		SetMenuDialogStartIndex(iNPCAttac)
+		SetMenuDialogDefaultIndex(1)
+		SetMenuDialogOptions(NPCAttac)
 
 	ElseIf(option[0] == "crtFilterMethod") ; Creature Filter
 		SetMenuDialogStartIndex(iCrtFilterMethod)
@@ -1245,6 +1268,12 @@ Event OnMenuAcceptST(int index)
 	ElseIf(option[0] == "filterType") ; Filter
 		iFilterType = index
 		SetMenuOptionValueST(FilterTypeList[index])
+	ElseIf(option[0] == "filterFol")
+		iFolAttac = index
+		SetMenuOptionValueST(FollowerAttac[index])
+	ElseIf(option[0] == "filterNPC")
+		iNPCAttac = index
+		SetMenuOptionValueST(NPCAttac[index])
 
 	ElseIf(option[0] == "crtFilterMethod") ; Creature Filter
 		iCrtFilterMethod = index
@@ -1345,10 +1374,6 @@ Event OnHighlightST()
 
 	ElseIf(option[0] == "filterType") ; Filter
 		SetInfoText("$Yam_filterTypeHighlight")
-	ElseIf(option[0] == "filterFolPl")
-		SetInfoText("$Yam_filterFolPlHighlight")
-	ElseIf(option[0] == "filterNpcNpc")
-		SetInfoText("$Yam_filterNpcNpcHighlight")
 
 	ElseIf(option[0] == "crtFilterMethod") ; Creature Filter
 		SetInfoText("$Yam_scrFilterMethodHighlight")
@@ -1987,8 +2012,8 @@ Function SavingMCM(String filepath)
 
 	; --- Filter
 	SetIntValue(filePath, "iFilterType", iFilterType)
-	SetIntValue(filePath, "bAssaultFolPl", bAssaultFolPl as int)
-	SetIntValue(filePath, "bAssaultNpcNpc", bAssaultNpcNpc as int)
+	SetIntValue(filePath, "iFolAttac", iFolAttac)
+	SetIntValue(filePath, "iNPCAttac", iNPCAttac)
 	IntListCopy(filePath, "bAssaultPl", boolToIntArray(bAssaultPl))
 	IntListCopy(filePath, "bAssaultNPC", boolToIntArray(bAssaultNPC))
 	IntListCopy(filePath, "bAssaultFol", boolToIntArray(bAssaultFol))
@@ -2102,8 +2127,8 @@ Function LoadingMCM(String filepath)
 
 	; --- Filter
 	iFilterType = GetIntValue(filePath, "iFilterType")
-	bAssaultFolPl = GetIntValue(filePath, "bAssaultFolPl") as bool
-	bAssaultNpcNpc = GetIntValue(filePath, "bAssaultNpcNpc") as bool
+	iFolAttac = GetIntValue(filePath, "iFolAttac")
+	iNPCAttac = GetIntValue(filePath, "iNPCAttac")
 	bAssaultPl = intToBoolArray(IntListToArray(filePath, "bAssaultPl"))
 	bAssaultNPC = intToBoolArray(IntListToArray(filePath, "bAssaultNPC"))
 	bAssaultFol = intToBoolArray(IntListToArray(filePath, "bAssaultFol"))
