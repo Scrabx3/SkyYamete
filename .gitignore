@@ -1,4 +1,4 @@
 .vscode/*
+.release
 .build-papyrus.yml
-*.ppj
 *.code-workspace

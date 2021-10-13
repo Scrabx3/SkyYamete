@@ -1,0 +1,71 @@
+<?xml version='1.0'?><!-- Game is either sse, tesv, or fo4 -->
+<PapyrusProject xmlns="PapyrusProject.xsd" 
+    Flags="TESV_Papyrus_Flags.flg" 
+    Game="sse" 
+    Output="Scripts" 
+    Optimize="true" 
+    Anonymize="true" 
+    Zip="true">
+    <Variables>
+        <Variable Name="ModName" Value="Yamete"/>
+        <Variable Name="ThisProject" Value="."/>
+        <Variable Name="Rel" Value=".\.release"/>
+        <Variable Name="MO2" Value=".."/>
+        <Variable Name="Ver" Value="4.0"/>
+    </Variables>
+    <Imports>
+        <Import>@ThisProject\Source\Scripts</Import>
+        <Import>@MO2\Creation Kit\Source\Scripts</Import>
+        <!-- Ressources -->
+        <Import>@MO2\PapyrusUtil SE - Modders Scripting Utility Functions\Source\Scripts</Import>
+        <Import>@MO2\powerofthree's Papyrus Extender\source\scripts</Import>
+        <Import>@MO2\JContainers SE\source\scripts</Import>
+        <Import>@MO2\SkyUI SDK\Source\Scripts</Import>
+        <Import>@MO2\OStim\Scripts\Source</Import>
+        <Import>@MO2\OSA - Skyrim Ascendancy Engine\Source\Scripts</Import>
+        <Import>@MO2\SexLab Framework\Source\Scripts</Import>
+        <Import>@MO2\XP32 Maximum Skeleton Special Extended\Source\Scripts</Import>
+        <Import>@MO2\Fores New Idles in Skyrim SE - FNIS SE\Source\Scripts</Import>
+        <Import>@MO2\FNIS Creature Pack SE\Source\Scripts</Import>
+        <Import>@MO2\Race Menu Sources\Source\Scripts</Import>
+        <Import>@MO2\ConsoleUtilSSE\Source\Scripts</Import>
+        <Import>@MO2\UIExtensions\Source\Scripts</Import>
+        <Import>@MO2\Mfg Fix\Source\Scripts</Import>
+        <Import>@MO2\SexLab Aroused\Source\Scripts</Import>
+        <Import>@MO2\SlaveTatsSE\Source\Scripts</Import>
+        <Import>@MO2\Flower Girls SE and VR\source\scripts</Import>
+        <!-- Base Game -->
+        <Import>C:\Program Files (x86)\Steam\steamapps\common\Skyrim Special Edition\Data\Source\Scripts</Import>
+    </Imports>
+    <Folders>
+        <Folder>@ThisProject\Source\Scripts</Folder>
+    </Folders>
+    <ZipFiles Output="@Rel">
+        <ZipFile Name="@ModName - @Ver" RootDir="@ThisProject" Compression="deflate">
+        	<Include>Yamete.esp</Include>
+            <Include>Interface</Include>
+            <Include>meshes</Include>
+            <Include>NetScriptFramework</Include>
+            <Include>Scripts</Include>
+            <Include>Seq</Include>
+            <Include>SKSE</Include>
+            <Include>Source</Include>
+            <Include>textures</Include>
+            <Include>LICENSE</Include>
+        </ZipFile>
+        <ZipFile Name="@ModName - @Ver LE Raw" RootDir="@ThisProject" Compression="deflate">
+        	<Include>Yamete.esp</Include>
+            <Include>Interface</Include>
+            <Include Path="meshes\actors\character\animations\Yamete">meshesLE\actors\character\animations\Yamete</Include>
+            <Include Path="meshes\actors\character\behaviors">meshesLE\actors\character\behaviors</Include>
+            <Include Path="meshes\Yamete\interface">meshesLE\Yamete\interface</Include>
+            <Include Path="meshes\Yamete\agent">meshesLE\Yamete\agent</Include>
+            <Include>Scripts</Include>
+            <Include>Seq</Include>
+            <Include>SKSE</Include>
+            <Include>Source</Include>
+            <Include>textures</Include>
+            <Include>LICENSE</Include>
+        </ZipFile>
+    </ZipFiles>
+</PapyrusProject>

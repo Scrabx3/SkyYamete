@@ -1,0 +1,10 @@
+Version V4.0
+
+b YamBleedout0 Yam_Bleed_DDoggy.hkx
+b YamBleedout1 Yam_Bleed_DDoggyAssUp.hkx
+b YamBleedout2 Yam_Bleed_DSideways.hkx
+b YamBleedout3 Yam_Bleed_DMissionary.hkx
+b YamBleedout4 Yam_Bleed_DMissionaryAssUp.hkx
+b YamBleedout5 Yam_Bleed_DLegSpread.hkx
+
+b -a YamSearchBleedout Yam_SearchBleedout.hkx
