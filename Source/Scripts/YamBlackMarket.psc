@@ -36,7 +36,7 @@ Function SellVictims()
 				priceMult *= 4
 			EndIf
 			priceMult *= 1 + (vicLv - player.GetLevel() * 0.15)
-			int price = Math.Floor(Utility.RandomFloat(200, 450) * priceMult)
+			int price = Math.Floor(Utility.RandomFloat(150, 300) * priceMult)
 			entryName += "/" + price + "g)"
 			menu.AddEntryItem(entryName)
 		EndIf
