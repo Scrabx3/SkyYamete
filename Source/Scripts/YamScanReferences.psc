@@ -68,7 +68,7 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 				bool blocked = MCM.bKdBlock[profile] && abHitBlocked
 			  bool ranged = MCM.bKdMelee[profile] && (akProjectile != none)
 	      If(!blocked && !ranged && ValidInteraction(myAggr))
-	        If(GetWeakened() || GetVulnerable(myItems))
+	        If(GetWeakened() || GetExhausted() || GetVulnerable(myItems))
 	          Aggressor = myAggr
 	          EnterKnockdown()
 	          return
@@ -78,7 +78,7 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 		Else ; Player Aggressor
 			bool blocked = MCM.bKdBlock[profile] && abHitBlocked && !PlayerRef.HasPerk(pPiercingStrike)
 			If(!blocked && ReaperKnockdown())
-			  If(GetWeakenedReaper() || GetVulnerable(myItems))
+			  If(GetWeakenedReaper() || GetExhausted() || GetVulnerable(myItems))
 					GotoState("Reaper")
 					return
 				EndIf
@@ -148,7 +148,7 @@ EndFunction
 
 bool Function GetWeakened()
   float healthPer = mySelf.GetActorValuePercentage("Health")
-  return healthPer <= MCM.fKdHpThreshUpper[profile] && healthPer >= MCM.fKdHpThreshLower[profile]
+  return healthPer < MCM.fKdHpThreshUpper[profile] && healthPer >= MCM.fKdHpThreshLower[profile]
 EndFunction
 
 bool Function GetWeakenedReaper()
@@ -159,6 +159,10 @@ EndFunction
 
 bool Function GetVulnerable(Form[] wornItems)
   return wornItems.length < MCM.iKdVulnerable[profile]
+EndFunction
+
+bool Function GetExhausted()
+  return mySelf.GetActorValuePercentage("Stamina") < MCM.fStaminaThresh[profile] && mySelf.GetActorValuePercentage("Magicka") < MCM.fMagickaThresh[profile]
 EndFunction
 
 Function CheckStrip(Form[] wornItems)

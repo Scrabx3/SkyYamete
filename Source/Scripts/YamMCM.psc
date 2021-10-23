@@ -100,6 +100,9 @@ bool[] Property bKdMelee Auto Hidden
 ; Weakened
 float[] Property fKdHpThreshUpper Auto Hidden
 float[] Property fKdHpThreshLower Auto Hidden
+; Exhausted
+float[] Property fStaminaThresh Auto Hidden
+float[] Property fMagickaThresh Auto Hidden
 ; Vulnerable
 int[] Property iKdVulnerable Auto Hidden
 ; Essential
@@ -355,6 +358,8 @@ Function startMod(bool loadMCM)
 	bKdMelee = CreateBoolArray(KnockdownProfile.length, false)
 	fKdHpThreshUpper = CreateFloatArray(KnockdownProfile.length, 0.5)
 	fKdHpThreshLower = CreateFloatArray(KnockdownProfile.length, 0.0)
+	fStaminaThresh = CreateFloatArray(KnockdownProfile.length, 0.4)
+	fMagickaThresh = CreateFloatArray(KnockdownProfile.length, 0.2)
 	iKdVulnerable = CreateIntArray(KnockdownProfile.length, 2)
 	bKdEssentialNPC = CreateBoolArray(KnockdownProfile.length, false)
 	iKdStrip = CreateIntArray(KnockdownProfile.length, 25)
@@ -507,8 +512,11 @@ Event OnPageReset(String Page)
 		AddToggleOptionST("KdMelee_" + i, "$Yam_KdProfileMelee", bKdMelee[i])
 		; ================= Weakened
 		AddHeaderOption(classColors[i] + "$Yam_KdProfileHeader0")
-		AddSliderOptionST("KDHpThreshUp_" + i, "$Yam_KdProfileHPThreshUpper", fKdHpThreshUpper[i] * 100, "{0}%")
-		AddSliderOptionST("KDHpThreshLow_" + i, "$Yam_KdProfileHPThreshLower", fKdHpThreshLower[i] * 100, "{0}%")
+		AddSliderOptionST("KdHpThreshUp_" + i, "$Yam_KdProfileHPThreshUpper", fKdHpThreshUpper[i] * 100, "{0}%")
+		AddSliderOptionST("KdHpThreshLow_" + i, "$Yam_KdProfileHPThreshLower", fKdHpThreshLower[i] * 100, "{0}%")
+		; ================= Exhausted
+		AddSliderOptionST("KdStaminaThresh_" + i, "$Yam_KdProfileStaminaThresh", fStaminaThresh[i] * 100, "{0}%")
+		AddSliderOptionST("KdMagickaThresh_" + i, "$Yam_KdProfileMagickaThresh", fMagickaThresh[i] * 100, "{0}%")
 		; ================= Vulnerable
 		AddHeaderOption(classColors[i] + "$Yam_KdProfileHeader1")
 		AddSliderOptionST("KdVulnerable_" + i, "$Yam_KdProfileVulnerable", iKdVulnerable[i], "{0}")
@@ -943,17 +951,29 @@ Event OnSliderOpenST()
 		SetSliderDialogDefaultValue(75)
 		SetSliderDialogRange(0, 100)
 		SetSliderDialogInterval(0.5)
-	ElseIf(option[0] == "KDHpThreshUp")
+	ElseIf(option[0] == "KdHpThreshUp")
 		int i = option[1] as int
 		SetSliderDialogStartValue(fKdHpThreshUpper[i] * 100)
 		SetSliderDialogDefaultValue(50)
 		SetSliderDialogRange(0, 100)
 		SetSliderDialogInterval(1)
-	ElseIf(option[0] == "KDHpThreshLow")
+	ElseIf(option[0] == "KdHpThreshLow")
 		int i = option[1] as int
 		SetSliderDialogStartValue(fKdHpThreshLower[i] * 100)
 		SetSliderDialogDefaultValue(5)
 		SetSliderDialogRange(0, (fKdHpThreshUpper[i] * 100))
+		SetSliderDialogInterval(1)
+	ElseIf(option[0] == "KdStaminaThresh")
+		int i = option[1] as int
+		SetSliderDialogStartValue(fStaminaThresh[i] * 100)
+		SetSliderDialogDefaultValue(5)
+		SetSliderDialogRange(0, (fStaminaThresh[i] * 100))
+		SetSliderDialogInterval(1)
+	ElseIf(option[0] == "KdMagickaThresh")
+		int i = option[1] as int
+		SetSliderDialogStartValue(fMagickaThresh[i] * 100)
+		SetSliderDialogDefaultValue(5)
+		SetSliderDialogRange(0, (fMagickaThresh[i] * 100))
 		SetSliderDialogInterval(1)
 	ElseIf(option[0] == "KdVulnerable")
 		int i = option[1] as int
@@ -1105,14 +1125,22 @@ Event OnSliderAcceptST(float value)
 		int i = option[1] as int
 		fKDChance[i] = value
 		SetSliderOptionValueST(fKDChance[i], "{1}%")
-	ElseIf(option[0] == "KDHpThreshUp")
+	ElseIf(option[0] == "KdHpThreshUp")
 		int i = option[1] as int
 		fKdHpThreshUpper[i] = value/100
 		SetSliderOptionValueST(fKdHpThreshUpper[i] * 100, "{0}%")
-	ElseIf(option[0] == "KDHpThreshLow")
+	ElseIf(option[0] == "KdHpThreshLow")
 		int i = option[1] as int
 		fKdHpThreshLower[i] = value/100
 		SetSliderOptionValueST(fKdHpThreshLower[i] * 100, "{0}%")
+	ElseIf(option[0] == "KdStaminaThresh")
+		int i = option[1] as int
+		fStaminaThresh[i] = value/100
+		SetSliderOptionValueST(fStaminaThresh[i] * 100, "{0}%")
+	ElseIf(option[0] == "KdMagickaThresh")
+		int i = option[1] as int
+		fMagickaThresh[i] = value/100
+		SetSliderOptionValueST(fMagickaThresh[i] * 100, "{0}%")
 	ElseIf(option[0] == "KdVulnerable")
 		int i = option[1] as int
 		iKdVulnerable[i] = value as int
@@ -1975,6 +2003,8 @@ Function SavingMCM(String filepath)
 	IntListCopy(filePath, "bKdMelee", boolToIntArray(bKdMelee))
 	FloatListCopy(filePath, "fKdHpThreshUpper", fKdHpThreshUpper)
 	FloatListCopy(filePath, "fKdHpThreshLower", fKdHpThreshLower)
+	FloatListCopy(filePath, "fStaminaThresh", fStaminaThresh)
+	FloatListCopy(filePath, "fMagickaThresh", fMagickaThresh)
 	IntListCopy(filePath, "iKdVulnerable", iKdVulnerable)
 	SetIntValue(filePath, "bKdEssentialPlayer", bKdEssentialPlayer as int)
 	IntListCopy(filePath, "bKdEssentialNPC", boolToIntArray(bKdEssentialNPC))
@@ -2090,6 +2120,8 @@ Function LoadingMCM(String filepath)
 	bKdMelee = intToBoolArray(IntListToArray(filePath, "bKdMelee"))
 	fKdHpThreshUpper = FloatListToArray(filePath, "fKdHpThreshUpper")
 	fKdHpThreshLower = FloatListToArray(filePath, "fKdHpThreshLower")
+	fStaminaThresh = FloatListToArray(filePath, "fStaminaThresh")
+	fMagickaThresh = FloatListToArray(filePath, "fMagickaThresh")
 	iKdVulnerable = IntListToArray(filePath, "iKdVulnerable")
 	bKdEssentialPlayer = GetIntValue(filePath, "bKdEssentialPlayer") as bool
 	bKdEssentialNPC = intToBoolArray(IntListToArray(filePath, "bKdEssentialNPC"))

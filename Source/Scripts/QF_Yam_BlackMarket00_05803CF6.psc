@@ -2,29 +2,9 @@
 ;NEXT FRAGMENT INDEX 19
 Scriptname QF_Yam_BlackMarket00_05803CF6 Extends Quest Hidden
 
-;BEGIN ALIAS PROPERTY Captured
-;ALIAS PROPERTY TYPE ReferenceAlias
-ReferenceAlias Property Alias_Captured Auto
-;END ALIAS PROPERTY
-
-;BEGIN ALIAS PROPERTY Charon
-;ALIAS PROPERTY TYPE ReferenceAlias
-ReferenceAlias Property Alias_Charon Auto
-;END ALIAS PROPERTY
-
-;BEGIN ALIAS PROPERTY Agent
-;ALIAS PROPERTY TYPE ReferenceAlias
-ReferenceAlias Property Alias_Agent Auto
-;END ALIAS PROPERTY
-
 ;BEGIN ALIAS PROPERTY Letter
 ;ALIAS PROPERTY TYPE ReferenceAlias
 ReferenceAlias Property Alias_Letter Auto
-;END ALIAS PROPERTY
-
-;BEGIN ALIAS PROPERTY AgemtSpawn
-;ALIAS PROPERTY TYPE ReferenceAlias
-ReferenceAlias Property Alias_AgemtSpawn Auto
 ;END ALIAS PROPERTY
 
 ;BEGIN ALIAS PROPERTY Letter2
@@ -37,6 +17,26 @@ ReferenceAlias Property Alias_Letter2 Auto
 ReferenceAlias Property Alias_Player Auto
 ;END ALIAS PROPERTY
 
+;BEGIN ALIAS PROPERTY Captured
+;ALIAS PROPERTY TYPE ReferenceAlias
+ReferenceAlias Property Alias_Captured Auto
+;END ALIAS PROPERTY
+
+;BEGIN ALIAS PROPERTY Agent
+;ALIAS PROPERTY TYPE ReferenceAlias
+ReferenceAlias Property Alias_Agent Auto
+;END ALIAS PROPERTY
+
+;BEGIN ALIAS PROPERTY Charon
+;ALIAS PROPERTY TYPE ReferenceAlias
+ReferenceAlias Property Alias_Charon Auto
+;END ALIAS PROPERTY
+
+;BEGIN ALIAS PROPERTY AgemtSpawn
+;ALIAS PROPERTY TYPE ReferenceAlias
+ReferenceAlias Property Alias_AgemtSpawn Auto
+;END ALIAS PROPERTY
+
 ;BEGIN FRAGMENT Fragment_2
 Function Fragment_2()
 ;BEGIN CODE
@@ -47,21 +47,10 @@ SetObjectiveDisplayed(10)
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_4
-Function Fragment_4()
+;BEGIN FRAGMENT Fragment_3
+Function Fragment_3()
 ;BEGIN CODE
-; Silent Stage. Set by YamBlackMarket00Player
-ObjectReference Letter = Alias_Letter2.GetReference()
-Letter.Enable()
-CourierScript.AddItemToContainer(Letter)
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_6
-Function Fragment_6()
-;BEGIN CODE
-; Player talked to Charon
+; Player enters Black Market for the first time
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -87,11 +76,13 @@ RegisterForSingleUpdate(6.7)
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_9
-Function Fragment_9()
+;BEGIN FRAGMENT Fragment_1
+Function Fragment_1()
 ;BEGIN CODE
-; Player denied Charons task
-SetObjectiveCompleted(10)
+; Silent Stage. Set by YamBlackMarket00Player
+ObjectReference Letter = Alias_Letter.GetReference()
+Letter.Enable()
+CourierScript.AddItemToContainer(Letter)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -111,39 +102,11 @@ Alias_Agent.GetReference().Enable()
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_11
-Function Fragment_11()
-;BEGIN CODE
-; Player gave up on Charons Mission
-SetObjectiveFailed(50)
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_8
-Function Fragment_8()
-;BEGIN CODE
-; Player accepted Charons Task
-SetObjectiveCompleted(10)
-SetObjectiveDisplayed(50)
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_14
-Function Fragment_14()
-;BEGIN CODE
-; Completed Agent Encounter, Agent no longer in LOS of player
-Alias_Agent.GetReference().Disable()
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_1
-Function Fragment_1()
+;BEGIN FRAGMENT Fragment_4
+Function Fragment_4()
 ;BEGIN CODE
 ; Silent Stage. Set by YamBlackMarket00Player
-ObjectReference Letter = Alias_Letter.GetReference()
+ObjectReference Letter = Alias_Letter2.GetReference()
 Letter.Enable()
 CourierScript.AddItemToContainer(Letter)
 ;END CODE
@@ -165,28 +128,49 @@ SetStage(101)
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_3
-Function Fragment_3()
-;BEGIN CODE
-; Player enters Black Market for the first time
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_17
-Function Fragment_17()
-;BEGIN CODE
-; Player leaves the Cave, Stop Quest
-SetStage(105) ; Fallback
-Stop()
-;END CODE
-EndFunction
-;END FRAGMENT
-
 ;BEGIN FRAGMENT Fragment_7
 Function Fragment_7()
 ;BEGIN CODE
 ; Finished Intro Dialogue Part1
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_11
+Function Fragment_11()
+;BEGIN CODE
+; Player gave up on Charons Mission
+SetObjectiveFailed(50)
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_10
+Function Fragment_10()
+;BEGIN CODE
+; Player exited Cave after accepting Charons quest
+Debug.Messagebox("You can now capture Targets in Bleedout.\nCaptured Targets will follow you around the world but be aware that they can free themselves if you go too far away or they are engaged in Combat.\n\nEnable Reapers Mercy in the MCM to force Targets into Bleedout yourself")
+Utility.Wait(0.1)
+Debug.Notification("You can now capture bleeding out Targets")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_14
+Function Fragment_14()
+;BEGIN CODE
+; Completed Agent Encounter, Agent no longer in LOS of player
+Alias_Agent.GetReference().Disable()
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_8
+Function Fragment_8()
+;BEGIN CODE
+; Player accepted Charons Task
+SetObjectiveCompleted(10)
+SetObjectiveDisplayed(50)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -202,13 +186,30 @@ EvalScene.Start()
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_10
-Function Fragment_10()
+;BEGIN FRAGMENT Fragment_17
+Function Fragment_17()
 ;BEGIN CODE
-; Player exited Cave after accepting Charons quest
-Debug.Messagebox("You can now capture Targets in Bleedout.\nCaptured Targets will follow you around the world but be aware that they can free themselves if you go too far away or they are engaged in Combat.\n\nEnable Reapers Mercy in the MCM to force Targets into Bleedout yourself")
-Utility.Wait(0.1)
-Debug.Notification("You can now capture bleeding out Targets")
+; Player leaves the Cave, Stop Quest
+SetStage(105) ; Fallback
+BMAgent.Enable()
+Stop()
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_6
+Function Fragment_6()
+;BEGIN CODE
+; Player talked to Charon
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_9
+Function Fragment_9()
+;BEGIN CODE
+; Player denied Charons task
+SetObjectiveCompleted(10)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -270,3 +271,5 @@ YamReapersMercy Property BlackMarket  Auto
 ImageSpaceModifier Property FadeToBlackHoldImod Auto
 
 ImageSpaceModifier Property FadeToBlackBackImod Auto
+
+ObjectReference Property BMAgent  Auto  
