@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="description.xsd">
+
+	<per-triangle-shape name="VirtualGround">
+		<margin>1</margin>
+		<prenetration>1</prenetration>
+		<tag>ground</tag>
+	</per-triangle-shape>
+	
+	<bone name="NPC Head [Head]"/>
+	<bone name="NPC L Clavicle [LClv]"/>
+	<bone name="NPC R Clavicle [RClv]"/>
+	<bone name="NPC L Breast"/>
+	<bone name="NPC R Breast"/>
+	<bone name="NPC L Breast01"/>
+	<bone name="NPC R Breast01"/>
+	<bone name="NPC L Forearm [LLar]"/>
+	<bone name="NPC R Forearm [RLar]"/>
+	<bone name="NPC L ForearmTwist1 [LLt1]"/>
+	<bone name="NPC R ForearmTwist1 [RLt1]"/>
+	<bone name="NPC L ForearmTwist2 [LLt2]"/>
+	<bone name="NPC R ForearmTwist2 [RLt2]"/>
+	<bone name="NPC L UpperArm [LUar]"/>
+	<bone name="NPC R UpperArm [RUar]"/>
+	<bone name="NPC L UpperarmTwist1 [LUt1]"/>
+	<bone name="NPC R UpperarmTwist1 [RUt1]"/>
+	<bone name="NPC L UpperarmTwist2 [LUt2]"/>
+	<bone name="NPC R UpperarmTwist2 [RUt2]"/>
+	<bone name="NPC L Hand [LHnd]"/>
+	<bone name="NPC R Hand [RHnd]"/>
+	<bone name="NPC Spine2 [Spn2]"/>
+	<bone name="NPC Spine1 [Spn1]"/>
+	<bone name="NPC Spine [Spn0]"/>
+	<bone name="NPC Belly"/>
+	<bone name="NPC Pelvis [Pelv]"/>
+	<bone name="NPC L Butt"/>
+	<bone name="NPC R Butt"/>
+	<bone name="NPC L Thigh [LThg]"/>
+	<bone name="NPC R Thigh [RThg]"/>
+	<bone name="NPC L Calf [LClf]"/>
+	<bone name="NPC R Calf [RClf]"/>
+	<bone name="NPC L Foot [Lft ]"/>
+	<bone name="NPC R Foot [Rft ]"/>
+		<bone name="NPC R Toe0 [RToe]"/>
+		<bone name="NPC L Toe0 [LToe]"/>
+		<bone-default>
+		<margin-multiplier>1</margin-multiplier>
+	</bone-default>
+	<bone name="RB 1"/>
+	<bone name="RM 1"/>
+	<bone name="RFM 1"/>
+	<bone name="RF 1"/>
+	<bone name="LB 1"/>
+	<bone name="LM 1"/>
+	<bone name="LFM 1"/>
+	<bone name="LF 1"/>
+	<bone name="RBM 1"/>
+	<bone name="LBM 1"/>
+
+
+
+
+
+<per-triangle-shape name="MaleBody">
+		<margin>1</margin>
+		<priority>1</priority>
+		<prenetration>0.1</prenetration>
+		<shared>private</shared>
+		<tag>body</tag>
+		<no-collide-with-tag>body</no-collide-with-tag>
+		<can-collide-with-tag>skirt</can-collide-with-tag>
+		<no-collide-with-tag>bikini</no-collide-with-tag>
+		<weight-threshold bone="NPC L Breast">1</weight-threshold>
+		<weight-threshold bone="NPC R Breast">1</weight-threshold>
+		<weight-threshold bone="NPC L Breast01">1</weight-threshold>
+		<weight-threshold bone="NPC R Breast01">1</weight-threshold>
+		<weight-threshold bone="NPC Spine [Spn0]">1</weight-threshold>
+		<weight-threshold bone="NPC Spine2 [Spn2]">1</weight-threshold>
+		<weight-threshold bone="NPC Spine1 [Spn1]">1</weight-threshold>
+		<weight-threshold bone="NPC Belly">1</weight-threshold>
+		<weight-threshold bone="NPC Pelvis [Pelv]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Butt">1</weight-threshold>
+		<weight-threshold bone="NPC R Butt">1</weight-threshold>
+		<weight-threshold bone="NPC L Thigh [LThg]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Thigh [RThg]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Calf [LClf]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Calf [RClf]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Foot [Lft ]">1</weight-threshold>
+		<weight-threshold bone="NPC R Foot [Rft ]">1</weight-threshold>
+
+			</per-triangle-shape>
+
+<per-triangle-shape name="feet">
+		<margin>1</margin>
+		<priority>1</priority>
+		<prenetration>0.2</prenetration>
+		<shared>private</shared>
+		<tag>body</tag>
+		<no-collide-with-tag>body</no-collide-with-tag>
+		<can-collide-with-tag>skirt</can-collide-with-tag>
+		<no-collide-with-tag>bikini</no-collide-with-tag>
+		<no-collide-with-tag>ground</no-collide-with-tag>
+		<weight-threshold bone="NPC L Breast">1</weight-threshold>
+		<weight-threshold bone="NPC R Breast">1</weight-threshold>
+		<weight-threshold bone="NPC L Breast01">1</weight-threshold>
+		<weight-threshold bone="NPC R Breast01">1</weight-threshold>
+		<weight-threshold bone="NPC Spine [Spn0]">1</weight-threshold>
+		<weight-threshold bone="NPC Spine2 [Spn2]">1</weight-threshold>
+		<weight-threshold bone="NPC Spine1 [Spn1]">1</weight-threshold>
+		<weight-threshold bone="NPC Belly">1</weight-threshold>
+		<weight-threshold bone="NPC Pelvis [Pelv]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Butt">1</weight-threshold>
+		<weight-threshold bone="NPC R Butt">1</weight-threshold>
+		<weight-threshold bone="NPC L Thigh [LThg]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Thigh [RThg]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Calf [LClf]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Calf [RClf]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Foot [Lft ]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Foot [Rft ]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Toe0 [RToe]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Toe0 [LToe]">0.3</weight-threshold>
+
+			</per-triangle-shape>
+<per-triangle-shape name="stopper">
+		<margin>1</margin>
+		<priority>1</priority>
+		<prenetration>0.01</prenetration>
+		<shared>private</shared>
+		<tag>body</tag>
+		<no-collide-with-tag>body</no-collide-with-tag>
+		<can-collide-with-tag>skirt</can-collide-with-tag>
+		<no-collide-with-tag>bikini</no-collide-with-tag>
+		<no-collide-with-tag>ground</no-collide-with-tag>
+		<weight-threshold bone="NPC L Breast">1</weight-threshold>
+		<weight-threshold bone="NPC R Breast">1</weight-threshold>
+		<weight-threshold bone="NPC L Breast01">1</weight-threshold>
+		<weight-threshold bone="NPC R Breast01">1</weight-threshold>
+		<weight-threshold bone="NPC Spine [Spn0]">1</weight-threshold>
+		<weight-threshold bone="NPC Spine2 [Spn2]">1</weight-threshold>
+		<weight-threshold bone="NPC Spine1 [Spn1]">1</weight-threshold>
+		<weight-threshold bone="NPC Belly">1</weight-threshold>
+		<weight-threshold bone="NPC Pelvis [Pelv]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Butt">1</weight-threshold>
+		<weight-threshold bone="NPC R Butt">1</weight-threshold>
+		<weight-threshold bone="NPC L Thigh [LThg]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Thigh [RThg]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Calf [LClf]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Calf [RClf]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Foot [Lft ]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Foot [Rft ]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Toe0 [RToe]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Toe0 [LToe]">0.3</weight-threshold>
+
+			</per-triangle-shape>
+<per-triangle-shape name="stopperK">
+		<margin>1</margin>
+		<priority>1</priority>
+		<prenetration>0.1</prenetration>
+		<shared>private</shared>
+		<tag>body</tag>
+		<no-collide-with-tag>body</no-collide-with-tag>
+		<can-collide-with-tag>skirt</can-collide-with-tag>
+		<no-collide-with-tag>bikini</no-collide-with-tag>
+		<no-collide-with-tag>ground</no-collide-with-tag>
+		<weight-threshold bone="NPC L Breast">1</weight-threshold>
+		<weight-threshold bone="NPC R Breast">1</weight-threshold>
+		<weight-threshold bone="NPC L Breast01">1</weight-threshold>
+		<weight-threshold bone="NPC R Breast01">1</weight-threshold>
+		<weight-threshold bone="NPC Spine [Spn0]">1</weight-threshold>
+		<weight-threshold bone="NPC Spine2 [Spn2]">1</weight-threshold>
+		<weight-threshold bone="NPC Spine1 [Spn1]">1</weight-threshold>
+		<weight-threshold bone="NPC Belly">1</weight-threshold>
+		<weight-threshold bone="NPC Pelvis [Pelv]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Butt">1</weight-threshold>
+		<weight-threshold bone="NPC R Butt">1</weight-threshold>
+		<weight-threshold bone="NPC L Thigh [LThg]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Thigh [RThg]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Calf [LClf]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Calf [RClf]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Foot [Lft ]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Foot [Rft ]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Toe0 [RToe]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Toe0 [LToe]">0.3</weight-threshold>
+
+			</per-triangle-shape>
+
+
+	<bone-default>
+		<margin-multiplier>0.5</margin-multiplier>
+	</bone-default>
+	<bone-default>
+    <mass>0.1</mass>
+    <inertia x="25" y="25" z="25"/>
+    <centerOfMassTransform>
+      <basis x="0" y="0" z="0" w="1"/>
+      <origin x="0" y="0" z="0"/>
+    </centerOfMassTransform>
+    <linearDamping>0.2</linearDamping>
+    <angularDamping>0.6</angularDamping>
+    <friction>1</friction>
+    <rollingFriction>0</rollingFriction>
+    <restitution>0</restitution>
+  </bone-default>
+
+
+ <bone name="RB 2"/>
+ <bone name="RM 2"/>
+ <bone name="RFM 2"/>
+ <bone name="RBM 2"/>
+ <bone name="LBM 2"/>
+ <bone name="RF 2"/>
+ <bone name="LB 2"/>
+ <bone name="LM 2"/>
+ <bone name="LFM 2"/>
+ <bone name="LF 2"/>
+ <bone name="RB 3"/>
+ <bone name="RM 3"/>
+ <bone name="RFM 3"/>
+ <bone name="RF 3"/>
+ <bone name="LB 3"/>
+ <bone name="LM 3"/>
+ <bone name="LFM 3"/>
+ <bone name="LF 3"/>
+ <bone name="RBM 3"/>
+ <bone name="LBM 3"/>
+ <bone name="RB 4"/>
+ <bone name="RM 4"/>
+ <bone name="RFM 4"/>
+ <bone name="RF 4"/>
+ <bone name="LB 4"/>
+ <bone name="LM 4"/>
+ <bone name="LFM 4"/>
+ <bone name="LF 4"/>
+ <bone name="RBM 4"/>
+ <bone name="LBM 4"/>
+ <bone name="RB 5"/>
+ <bone name="RM 5"/>
+ <bone name="RFM 5"/>
+ <bone name="RF 5"/>
+ <bone name="LB 5"/>
+ <bone name="LM 5"/>
+ <bone name="LFM 5"/>
+ <bone name="LF 5"/>
+ <bone name="RBM 5"/>
+ <bone name="LBM 5"/>
+ <bone name="RB 6"/>
+ <bone name="RM 6"/>
+ <bone name="RFM 6"/>
+ <bone name="RF 6"/>
+ <bone name="LB 6"/>
+ <bone name="LM 6"/>
+ <bone name="LFM 6"/>
+ <bone name="LF 6"/>
+ <bone name="RBM 6"/>
+ <bone name="LBM 6"/>
+ <bone name="RB 7"/>
+ <bone name="RM 7"/>
+ <bone name="RFM 7"/>
+ <bone name="RF 7"/>
+ <bone name="LB 7"/>
+ <bone name="LM 7"/>
+ <bone name="LFM 7"/>
+ <bone name="LF 7"/>
+ <bone name="RBM 7"/>
+ <bone name="LBM 7"/>
+
+ 
+ 
+	<generic-constraint-default>
+		<frameInB>
+			<basis x="0" y="0" z="0" w="1" />
+			<origin x="0" y="0" z="0" />
+		</frameInB>
+		<useLinearReferenceFrameA>false</useLinearReferenceFrameA>
+		<linearLowerLimit x="0" y="0" z="0" />
+		<linearUpperLimit x="0" y="0" z="0" />
+		<angularLowerLimit x="-0.05" y="-0.05" z="-0.05" />
+		<angularUpperLimit x="0.05" y="0.05" z="0.05" />
+		<linearStiffness x="0" y="0" z="0" />
+		<angularStiffness x="0" y="0" z="0" />
+		<linearDamping x="0" y="0" z="0" />
+		<angularDamping x="0" y="0" z="0" />
+		<linearEquilibrium x="0" y="0" z="0" />
+		<angularEquilibrium x="0" y="0" z="0" />
+	</generic-constraint-default>
+
+
+<generic-constraint bodyA="RB 2" bodyB="RB 1"/>
+<generic-constraint bodyA="RB 3" bodyB="RB 2"/>
+<generic-constraint bodyA="RB 4" bodyB="RB 3"/>
+<generic-constraint bodyA="RB 5" bodyB="RB 4"/>
+<generic-constraint bodyA="RB 6" bodyB="RB 5"/>
+<generic-constraint bodyA="RB 7" bodyB="RB 6"/>
+
+
+
+
+<generic-constraint bodyA="RM 2" bodyB="RM 1"/>
+<generic-constraint bodyA="RM 3" bodyB="RM 2"/>
+<generic-constraint bodyA="RM 4" bodyB="RM 3"/>
+<generic-constraint bodyA="RM 5" bodyB="RM 4"/>
+<generic-constraint bodyA="RM 6" bodyB="RM 5"/>
+<generic-constraint bodyA="RM 7" bodyB="RM 6"/>
+
+
+
+<generic-constraint bodyA="RFM 2" bodyB="RFM 1"/>
+<generic-constraint bodyA="RFM 3" bodyB="RFM 2"/>
+<generic-constraint bodyA="RFM 4" bodyB="RFM 3"/>
+<generic-constraint bodyA="RFM 5" bodyB="RFM 4"/>
+<generic-constraint bodyA="RFM 6" bodyB="RFM 5"/>
+<generic-constraint bodyA="RFM 7" bodyB="RFM 6"/>
+
+
+
+
+<generic-constraint bodyA="RF 2" bodyB="RF 1"/>
+<generic-constraint bodyA="RF 3" bodyB="RF 2"/>
+<generic-constraint bodyA="RF 4" bodyB="RF 3"/>
+<generic-constraint bodyA="RF 5" bodyB="RF 4"/>
+<generic-constraint bodyA="RF 6" bodyB="RF 5"/>
+<generic-constraint bodyA="RF 7" bodyB="RF 6"/>
+
+
+
+
+<generic-constraint bodyA="RBM 2" bodyB="RBM 1"/>
+<generic-constraint bodyA="RBM 3" bodyB="RBM 2"/>
+<generic-constraint bodyA="RBM 4" bodyB="RBM 3"/>
+<generic-constraint bodyA="RBM 5" bodyB="RBM 4"/>
+<generic-constraint bodyA="RBM 6" bodyB="RBM 5"/>
+<generic-constraint bodyA="RBM 7" bodyB="RBM 6"/>
+
+
+
+
+<generic-constraint bodyA="LB 2" bodyB="LB 1"/>
+<generic-constraint bodyA="LB 3" bodyB="LB 2"/>
+<generic-constraint bodyA="LB 4" bodyB="LB 3"/>
+<generic-constraint bodyA="LB 5" bodyB="LB 4"/>
+<generic-constraint bodyA="LB 6" bodyB="LB 5"/>
+<generic-constraint bodyA="LB 7" bodyB="LB 6"/>
+
+
+
+
+<generic-constraint bodyA="LFM 2" bodyB="LFM 1"/>
+<generic-constraint bodyA="LFM 3" bodyB="LFM 2"/>
+<generic-constraint bodyA="LFM 4" bodyB="LFM 3"/>
+<generic-constraint bodyA="LFM 5" bodyB="LFM 4"/>
+<generic-constraint bodyA="LFM 6" bodyB="LFM 5"/>
+<generic-constraint bodyA="LFM 7" bodyB="LFM 6"/>
+
+
+
+
+<generic-constraint bodyA="LM 2" bodyB="LM 1"/>
+<generic-constraint bodyA="LM 3" bodyB="LM 2"/>
+<generic-constraint bodyA="LM 4" bodyB="LM 3"/>
+<generic-constraint bodyA="LM 5" bodyB="LM 4"/>
+<generic-constraint bodyA="LM 6" bodyB="LM 5"/>
+<generic-constraint bodyA="LM 7" bodyB="LM 6"/>
+
+
+
+
+<generic-constraint bodyA="LF 2" bodyB="LF 1"/>
+<generic-constraint bodyA="LF 3" bodyB="LF 2"/>
+<generic-constraint bodyA="LF 4" bodyB="LF 3"/>
+<generic-constraint bodyA="LF 5" bodyB="LF 4"/>
+<generic-constraint bodyA="LF 6" bodyB="LF 5"/>
+<generic-constraint bodyA="LF 7" bodyB="LF 6"/>
+
+
+
+
+<generic-constraint bodyA="LBM 2" bodyB="LBM 1"/>
+<generic-constraint bodyA="LBM 3" bodyB="LBM 2"/>
+<generic-constraint bodyA="LBM 4" bodyB="LBM 3"/>
+<generic-constraint bodyA="LBM 5" bodyB="LBM 4"/>
+<generic-constraint bodyA="LBM 6" bodyB="LBM 5"/>
+<generic-constraint bodyA="LBM 7" bodyB="LBM 6"/>
+
+
+
+	    
+	<generic-constraint-default>
+    <frameInLerp>
+			<translationLerp>0</translationLerp>
+			<rotationLerp>0</rotationLerp>
+    </frameInLerp>
+	<linearLowerLimit x="-2" y="-2" z="-7" />
+    <linearUpperLimit x="16" y="16" z="7" />
+    <angularLowerLimit x="-10" y="-10" z="-10" />
+    <angularUpperLimit x="10" y="10" z="10" />
+	<linearStiffness x="0" y="0" z="0" />
+    <angularStiffness x="0" y="0" z="0" />
+   </generic-constraint-default>
+  
+	<constraint-group>
+<generic-constraint bodyA="RB 2" bodyB="RBM 2"/>
+<generic-constraint bodyA="RBM 2" bodyB="RM 2"/>
+<generic-constraint bodyA="RM 2" bodyB="RFM 2"/>
+<generic-constraint bodyA="RFM 2" bodyB="RF 2"/>
+<generic-constraint bodyA="RF 2" bodyB="LF 2"/>
+<generic-constraint bodyA="LF 2" bodyB="LFM 2"/>
+<generic-constraint bodyA="LFM 2" bodyB="LM 2"/>
+<generic-constraint bodyA="LM 2" bodyB="LBM 2"/>
+<generic-constraint bodyA="LBM 2" bodyB="LB 2"/>
+<generic-constraint bodyA="LB 2" bodyB="RB 2"/>
+	</constraint-group>
+	<constraint-group>
+<generic-constraint bodyA="RB 3" bodyB="RBM 3"/>
+<generic-constraint bodyA="RBM 3" bodyB="RM 3"/>
+<generic-constraint bodyA="RM 3" bodyB="RFM 3"/>
+<generic-constraint bodyA="RFM 3" bodyB="RF 3"/>
+<generic-constraint bodyA="RF 3" bodyB="LF 3"/>
+<generic-constraint bodyA="LF 3" bodyB="LFM 3"/>
+<generic-constraint bodyA="LFM 3" bodyB="LM 3"/>
+<generic-constraint bodyA="LM 3" bodyB="LBM 3"/>
+<generic-constraint bodyA="LBM 3" bodyB="LB 3"/>
+<generic-constraint bodyA="LB 3" bodyB="RB 3"/>
+	</constraint-group>
+	<constraint-group>
+<generic-constraint bodyA="RB 4" bodyB="RBM 4"/>
+<generic-constraint bodyA="RBM 4" bodyB="RM 4"/>
+<generic-constraint bodyA="RM 4" bodyB="RFM 4"/>
+<generic-constraint bodyA="RFM 4" bodyB="RF 4"/>
+<generic-constraint bodyA="RF 4" bodyB="LF 4"/>
+<generic-constraint bodyA="LF 4" bodyB="LFM 4"/>
+<generic-constraint bodyA="LFM 4" bodyB="LM 4"/>
+<generic-constraint bodyA="LM 4" bodyB="LBM 4"/>
+<generic-constraint bodyA="LBM 4" bodyB="LB 4"/>
+<generic-constraint bodyA="LB 4" bodyB="RB 4"/>
+	</constraint-group>
+	<constraint-group>
+<generic-constraint bodyA="RB 5" bodyB="RBM 5"/>
+<generic-constraint bodyA="RBM 5" bodyB="RM 5"/>
+<generic-constraint bodyA="RM 5" bodyB="RFM 5"/>
+<generic-constraint bodyA="RFM 5" bodyB="RF 5"/>
+<generic-constraint bodyA="RF 5" bodyB="LF 5"/>
+<generic-constraint bodyA="LF 5" bodyB="LFM 5"/>
+<generic-constraint bodyA="LFM 5" bodyB="LM 5"/>
+<generic-constraint bodyA="LM 5" bodyB="LBM 5"/>
+<generic-constraint bodyA="LBM 5" bodyB="LB 5"/>
+<generic-constraint bodyA="LB 5" bodyB="RB 5"/>
+	</constraint-group>
+
+		<constraint-group>
+<generic-constraint bodyA="RB 6" bodyB="RBM 6"/>
+<generic-constraint bodyA="RBM 6" bodyB="RM 6"/>
+<generic-constraint bodyA="RM 6" bodyB="RFM 6"/>
+<generic-constraint bodyA="RFM 6" bodyB="RF 6"/>
+<generic-constraint bodyA="RF 6" bodyB="LF 6"/>
+<generic-constraint bodyA="LF 6" bodyB="LFM 6"/>
+<generic-constraint bodyA="LFM 6" bodyB="LM 6"/>
+<generic-constraint bodyA="LM 6" bodyB="LBM 6"/>
+<generic-constraint bodyA="LBM 6" bodyB="LB 6"/>
+<generic-constraint bodyA="LB 6" bodyB="RB 6"/>
+	</constraint-group>
+	
+		<constraint-group>
+<generic-constraint bodyA="RB 7" bodyB="RBM 7"/>
+<generic-constraint bodyA="RBM 7" bodyB="RM 7"/>
+<generic-constraint bodyA="RM 7" bodyB="RFM 7"/>
+<generic-constraint bodyA="RFM 7" bodyB="RF 7"/>
+<generic-constraint bodyA="RF 7" bodyB="LF 7"/>
+<generic-constraint bodyA="LF 7" bodyB="LFM 7"/>
+<generic-constraint bodyA="LFM 7" bodyB="LM 7"/>
+<generic-constraint bodyA="LM 7" bodyB="LBM 7"/>
+<generic-constraint bodyA="LBM 7" bodyB="LB 7"/>
+<generic-constraint bodyA="LB 7" bodyB="RB 7"/>
+	</constraint-group>
+
+	
+		
+
+	
+<per-triangle-shape name="AgentsCoat">
+		<margin>1</margin>
+		<priority>0.5</priority>
+		<prenetration>-0.2</prenetration>
+		<shared>private</shared>
+		<tag>skirt</tag>
+		<can-collide-with-tag>body</can-collide-with-tag>
+		<can-collide-with-tag>skirt</can-collide-with-tag>
+		<no-collide-with-tag>bikini</no-collide-with-tag>
+		<no-collide-with-bone>NPC L Forearm [LLar]</no-collide-with-bone>
+		<no-collide-with-bone>NPC R Forearm [RLar]</no-collide-with-bone>
+		<no-collide-with-bone>NPC L ForearmTwist1 [LLt1]</no-collide-with-bone>
+		<no-collide-with-bone>NPC R ForearmTwist1 [RLt1]</no-collide-with-bone>
+		<no-collide-with-bone>NPC L ForearmTwist2 [LLt2]</no-collide-with-bone>
+		<no-collide-with-bone>NPC R ForearmTwist2 [RLt2]</no-collide-with-bone>
+		<no-collide-with-bone>NPC L Hand [LHnd]</no-collide-with-bone>
+		<no-collide-with-bone>NPC R Hand [RHnd]</no-collide-with-bone>
+			<weight-threshold bone="NPC Spine [Spn0]">1</weight-threshold>
+		<weight-threshold bone="NPC Spine2 [Spn2]">1</weight-threshold>
+		<weight-threshold bone="NPC Spine1 [Spn1]">1</weight-threshold>
+		<weight-threshold bone="NPC Belly">1</weight-threshold>
+		<weight-threshold bone="NPC Pelvis [Pelv]">1</weight-threshold>
+		<weight-threshold bone="NPC L Butt">1</weight-threshold>
+		<weight-threshold bone="NPC R Butt">1</weight-threshold>
+		<weight-threshold bone="NPC L Thigh [LThg]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Thigh [RThg]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Calf [LClf]">0.3</weight-threshold>
+		<weight-threshold bone="NPC R Calf [RClf]">0.3</weight-threshold>
+		<weight-threshold bone="NPC L Foot [Lft ]">1</weight-threshold>
+		<weight-threshold bone="NPC R Foot [Rft ]">1</weight-threshold>
+
+		<weight-threshold bone="RF 2">0.2</weight-threshold>
+		<weight-threshold bone="RF 3">0.2</weight-threshold>
+		<weight-threshold bone="RF 4">0.2</weight-threshold>
+		<weight-threshold bone="RF 5">0.2</weight-threshold>
+		<weight-threshold bone="RF 6">0.2</weight-threshold>
+		<weight-threshold bone="RF 7">0.2</weight-threshold>
+
+
+		<weight-threshold bone="RFM 2">0.2</weight-threshold>
+		<weight-threshold bone="RFM 3">0.2</weight-threshold>
+		<weight-threshold bone="RFM 4">0.2</weight-threshold>
+		<weight-threshold bone="RFM 5">0.2</weight-threshold>
+		<weight-threshold bone="RFM 6">0.2</weight-threshold>
+		<weight-threshold bone="RFM 7">0.2</weight-threshold>
+
+
+		<weight-threshold bone="RM 2">0.2</weight-threshold>
+		<weight-threshold bone="RM 3">0.2</weight-threshold>
+		<weight-threshold bone="RM 4">0.2</weight-threshold>
+		<weight-threshold bone="RM 5">0.2</weight-threshold>
+		<weight-threshold bone="RM 6">0.2</weight-threshold>
+		<weight-threshold bone="RM 7">0.2</weight-threshold>
+
+
+		<weight-threshold bone="RB 2">0.2</weight-threshold>
+		<weight-threshold bone="RB 3">0.2</weight-threshold>
+		<weight-threshold bone="RB 4">0.2</weight-threshold>
+		<weight-threshold bone="RB 5">0.2</weight-threshold>
+		<weight-threshold bone="RB 6">0.2</weight-threshold>
+		<weight-threshold bone="RB 7">0.2</weight-threshold>
+
+
+		
+		<weight-threshold bone="RBM 2">0.2</weight-threshold>
+		<weight-threshold bone="RBM 3">0.2</weight-threshold>
+		<weight-threshold bone="RBM 4">0.2</weight-threshold>
+		<weight-threshold bone="RBM 5">0.2</weight-threshold>
+		<weight-threshold bone="RBM 6">0.2</weight-threshold>
+		<weight-threshold bone="RBM 7">0.2</weight-threshold>
+
+
+
+		<weight-threshold bone="LF 2">0.2</weight-threshold>
+		<weight-threshold bone="LF 3">0.2</weight-threshold>
+		<weight-threshold bone="LF 4">0.2</weight-threshold>
+		<weight-threshold bone="LF 5">0.2</weight-threshold>
+		<weight-threshold bone="LF 6">0.2</weight-threshold>
+		<weight-threshold bone="LF 7">0.2</weight-threshold>
+
+
+		
+		<weight-threshold bone="LFM 2">0.2</weight-threshold>
+		<weight-threshold bone="LFM 3">0.2</weight-threshold>
+		<weight-threshold bone="LFM 4">0.2</weight-threshold>
+		<weight-threshold bone="LFM 5">0.2</weight-threshold>
+		<weight-threshold bone="LFM 6">0.2</weight-threshold>
+		<weight-threshold bone="LFM 7">0.2</weight-threshold>
+
+
+		<weight-threshold bone="LM 2">0.2</weight-threshold>
+		<weight-threshold bone="LM 3">0.2</weight-threshold>
+		<weight-threshold bone="LM 4">0.2</weight-threshold>
+		<weight-threshold bone="LM 5">0.2</weight-threshold>
+		<weight-threshold bone="LM 6">0.2</weight-threshold>
+		<weight-threshold bone="LM 7">0.2</weight-threshold>
+
+
+		<weight-threshold bone="LB 2">0.2</weight-threshold>
+		<weight-threshold bone="LB 3">0.2</weight-threshold>
+		<weight-threshold bone="LB 4">0.2</weight-threshold>
+		<weight-threshold bone="LB 5">0.2</weight-threshold>
+		<weight-threshold bone="LB 6">0.2</weight-threshold>
+		<weight-threshold bone="LB 7">0.2</weight-threshold>
+
+
+		<weight-threshold bone="LBM 2">0.2</weight-threshold>
+		<weight-threshold bone="LBM 3">0.2</weight-threshold>
+		<weight-threshold bone="LBM 4">0.2</weight-threshold>
+		<weight-threshold bone="LBM 5">0.2</weight-threshold>
+		<weight-threshold bone="LBM 6">0.2</weight-threshold>
+		<weight-threshold bone="LBM 7">0.2</weight-threshold>
+
+
+	</per-triangle-shape>
+
+</system>

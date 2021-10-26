@@ -515,6 +515,7 @@ Event OnPageReset(String Page)
 		AddSliderOptionST("KdHpThreshUp_" + i, "$Yam_KdProfileHPThreshUpper", fKdHpThreshUpper[i] * 100, "{0}%")
 		AddSliderOptionST("KdHpThreshLow_" + i, "$Yam_KdProfileHPThreshLower", fKdHpThreshLower[i] * 100, "{0}%")
 		; ================= Exhausted
+		AddHeaderOption(classColors[i] + "$Yam_KdProfileHeader5")
 		AddSliderOptionST("KdStaminaThresh_" + i, "$Yam_KdProfileStaminaThresh", fStaminaThresh[i] * 100, "{0}%")
 		AddSliderOptionST("KdMagickaThresh_" + i, "$Yam_KdProfileMagickaThresh", fMagickaThresh[i] * 100, "{0}%")
 		; ================= Vulnerable
@@ -622,7 +623,7 @@ Event OnPageReset(String Page)
 			i += 1
 		EndWhile
 		SetCursorPosition(1)
-		AddHeaderOption(classColors[0] + "$Yam_mPlayer")
+		AddHeaderOption(classColors[0] + "$Yam_filterClassesPlayer")
 		i = 0
 		While(i < 5)
 			If(i != 2 && i != 4 || bSupportFilter == true)
@@ -1416,6 +1417,10 @@ Event OnHighlightST()
 		SetInfoText("$Yam_KdProfileHpThreshUpperHighlight")
 	ElseIf(option[0] == "KDHpThreshLow")
 		SetInfoText("$Yam_KdProfileHpThreshLowerHighlight")
+	ElseIf(option[0] == "KdStaminaThresh")
+		SetInfoText("$Yam_KdProfileStaminaThreshHighlight")
+	ElseIf(option[0] == "KdMagickaThresh")
+		SetInfoText("$Yam_KdProfileMagickaThreshHighlight")
 	ElseIf(option[0] == "KdVulnerable")
 		SetInfoText("$Yam_KdProfileVulnerableHighlight")
 	ElseIf(option[0] == "KdStripOdds")
