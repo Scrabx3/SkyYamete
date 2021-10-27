@@ -61,7 +61,7 @@
 
 
 
-<per-triangle-shape name="MaleBody">
+<per-triangle-shape name="AgentBody">
 		<margin>1</margin>
 		<priority>1</priority>
 		<prenetration>0.1</prenetration>

@@ -58,8 +58,9 @@
             <Include>Interface</Include>
             <Include Path="meshes\actors\character\animations\Yamete">meshesLE\actors\character\animations\Yamete</Include>
             <Include Path="meshes\actors\character\behaviors">meshesLE\actors\character\behaviors</Include>
+            <Include Path="meshes\actors\character\FaceGenData\FaceGeom\Yamete.esp">meshesLE\actors\character\FaceGenData\FaceGeom\Yamete.esp</Include>
             <Include Path="meshes\Yamete\interface">meshesLE\Yamete\interface</Include>
-            <Include Path="meshes\Yamete\agent">meshesLE\Yamete\agent</Include>
+            <Include Path="meshes\Yamete" NoRecurse="true">meshesLE\Yamete</Include>
             <Include>Scripts</Include>
             <Include>Seq</Include>
             <Include>SKSE</Include>
