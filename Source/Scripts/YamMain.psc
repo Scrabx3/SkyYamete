@@ -387,7 +387,7 @@ bool Function isValidGenderCombination(Actor akVictim, Actor akAggressor)
     EndIf
   EndIf
 	int agrGender = GetActorType(akAggressor)
-  If(plVic)
+  If(!plVic)
     int vicGender = GetActorType(akVictim)
 		If(isFolV)
 			return MCM.bAssaultFol[vicGender * 5 + agrGender]

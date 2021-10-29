@@ -29,112 +29,144 @@ bool Function StartSceneForm(Actor first, Actor[] partners, Form source = none) 
 EndFunction
 
 dxSceneThread Function StartSceneFlowergirls(Actor first, Actor[] partners) global
-  ; FG unfortunately doesnt report back if an Animation failed to start, so there always somewhat of a gamble if the mod gets stuck using it
-  ; I believe all I can do here for now is checking if a Thread exists and then menually building the function. oof
-  ; return none
-  dxFlowerGirlsScript FG = (Quest.GetQuest("FlowerGirls") as dxFlowerGirlsScript)
-  dxSceneThread thread = FG.ValidateThread(first, partners[0])
-  If(thread == none)
+  ; FG doesnt report back if an Animation failed to start, will need this workaround instead Zzz
+  ; Majority Code here is copied from dxFlowerGirlsScript.psc
+  If(!first || !partners[0])
     return none
   EndIf
-  ; Building our own FG Function here I guess
-  ; I mostly rely on FGs logic and wont question its doings, I will only rephrase the syntax to allow the script to compile
-  FormList tokensF
-  FormList tokensM
-  If(partners.length == 1)
-    int gender0 = thread.Participant01.Gender ; 0 - Male // 1 - Female
-    int gender1 = thread.Participant02.Gender
-    If(gender0 == gender1) ; Gay
-      If(gender0 == 0) ; Male on Male
-        tokensF = FG.RandomTokensMMActor2
-        tokensM = FG.RandomTokensMMActor1
-      else ; Female on Female
-        tokensF = FG.RandomTokensFFActor2
-        tokensM = FG.RandomTokensFFActor1
+  dxFlowerGirlsScript FG = (Quest.GetQuest("FlowerGirls") as dxFlowerGirlsScript)
+  dxSceneThread thread = FG.ThreadManager.GetNextAvailableThread()  
+  If(thread)
+    thread.Participant01.ForceRefTo(first)
+    thread.Participant02.ForceRefTo(partners[0])
+  Else
+    Debug.Trace("[Yamete] <Flowergirls> No Thread Found")
+    return none
+  EndIf
+  If(!partners[1]) ; 2p Scene
+    Form tokenFemale
+	  Form tokenMale
+		If(thread.Participant01.Gender == 0) ; Male
+      If(thread.Participant02.Gender == 0) ; Actor2 is Male
+        int rnd = Utility.RandomInt(0, (FG.RandomTokensMMActor1.GetSize() - 1))
+        tokenFemale = FG.RandomTokensMMActor2.GetAt(rnd) 
+        tokenMale = FG.RandomTokensMMActor1.GetAt(rnd)
+      Else ; Actor1 is Male and Actor2 is Female
+        int rnd = Utility.RandomInt(0, (FG.RandomTokensMFActor1.GetSize() - 1))
+        tokenFemale = FG.RandomTokensMFActor2.GetAt(rnd) 
+        tokenMale = FG.RandomTokensMFActor1.GetAt(rnd)
       EndIf
-    ElseIf(gender0 == 0) ; Male on Female
-      tokensF = FG.RandomTokensMFActor2
-      tokensM = FG.RandomTokensMFActor1
-    else ; Female on Male
-      tokensF = FG.RandomTokensFMActor2
-      tokensM = FG.RandomTokensFMActor1
+    Else ; Actor1 is Female
+      thread.Participant01.HideStrapOn = True
+      If(thread.Participant02.Gender == 0) ; Actor2 is Male
+        int rnd = Utility.RandomInt(0, (FG.RandomTokensFMActor1.GetSize() - 1))
+        tokenFemale = FG.RandomTokensFMActor2.GetAt(rnd) 
+        tokenMale = FG.RandomTokensFMActor1.GetAt(rnd)
+      Else ; Actor1 is Female and Actor2 is Female
+        If(FG.FlowerGirlsConfig.DX_FEMALE_ISMALEROLE.GetValueInt() > 0)
+          FormList actor1MaleRole = FG.RandomTokensFFActor1MaleNoLes
+          FormList actor2MaleRole = FG.RandomTokensFFActor2MaleNoLes
+          If(FG.FlowerGirlsConfig.DX_ALLOW_LESBIAN_ANIMS)
+            actor1MaleRole = FG.RandomTokensFFActor1MaleRole
+            actor2MaleRole = FG.RandomTokensFFActor2MaleRole
+          EndIf
+          int rnd = Utility.RandomInt(0, (actor1MaleRole.GetSize() - 1))
+          tokenFemale = actor2MaleRole.GetAt(rnd) 
+          tokenMale = actor1MaleRole.GetAt(rnd) 
+          If(tokenMale == FG.SexPositions.TokenCowgirlMale || tokenMale == FG.SexPositions.TokenDoggyMale || tokenMale == FG.SexPositions.TokenMissionaryMale || tokenMale == FG.SexPositions.TokenStandingMale)
+            thread.Participant01.HideStrapOn = False
+          EndIf
+        Else
+          int rnd = Utility.RandomInt(0, (FG.RandomTokensFFActor1.GetSize() - 1))
+          tokenFemale = FG.RandomTokensFFActor2.GetAt(rnd) 
+          tokenMale = FG.RandomTokensFFActor1.GetAt(rnd)
+        EndIf
+      EndIf
     EndIf
-    Form tokenF = tokensF.GetAt(Utility.RandomInt(0, tokensF.GetSize() - 1))
-  	Form tokenM = tokensM.GetAt(Utility.RandomInt(0, tokensM.GetSize() - 1))
-    If(tokenF == none || tokenM == none)
-      Debug.Trace("Yamete: FG-Clone of RandomScene(); at least one of tokens received is none; tokenF = " + tokenF + " // tokenM: " + tokenM)
+    If(!tokenFemale || !tokenMale)
+      Debug.Trace("[Yamete] <Flowergirls> Invalid Tokens Passed")
       return none
-    EndIf
-    thread.Participant01.SexType = tokenM as Ammo
-  	thread.Participant02.SexType = tokenF as Ammo
+    endIf
+    thread.Participant01.SexType = tokenMale as Ammo
+    thread.Participant02.SexType = tokenFemale as Ammo
     thread.SceneType = 11
     FG.FlowerGirlsConfig.DX_LAST_SCENETYPE.SetValueInt(thread.SceneType)
-  Else ; partners.length == 2
-    ; Add the 3rd Actor into the slot or so
+    bool started = thread.StartScene()
+    ; Clean up the local aliases.
+    FG.FirstActorRef.Clear()
+    FG.SecondActorRef.Clear()
+    If(started)
+      return thread
+    Else
+      return none
+    EndIf
+  Else ; 3p
     thread.Participant03.ForceRefTo(partners[1])
-    If(thread.Participant01.Gender == 0) ; Male 1st
-  	  If(thread.Participant02.Gender == thread.Participant03.Gender)
-        If(thread.Participant02.Gender == 1) ; Female Partners
+    If(thread.Participant01.Gender == 0) ; Actor 1 is male
+		  If(thread.Participant02.Gender == 1 && thread.Participant03.Gender == 1)
+        thread.Participant03.SexType = FG.SexPositions.TokenFFMActor1
+        thread.Participant01.SexType = FG.SexPositions.TokenFFMActor2
+        thread.Participant02.SexType = FG.SexPositions.TokenFFMActor3
+      Else
+			  If(thread.Participant02.Gender == 1)
+				  thread.Participant02.SexType = FG.SexPositions.TokenMMFActor1 	; SecondActorRef is female
+				  thread.Participant01.SexType = FG.SexPositions.TokenMMFActor2		; Player is male
+				  thread.Participant03.SexType = FG.SexPositions.TokenMMFActor3		; ThirdActorRef is male
+        ElseIf(thread.Participant03.Gender == 1)
+          thread.Participant02.SexType = FG.SexPositions.TokenMMFActor3 	; SecondActorRef is male
+          thread.Participant01.SexType = FG.SexPositions.TokenMMFActor2		; Player is male
+          thread.Participant03.SexType = FG.SexPositions.TokenMMFActor1		; ThirdActorRef is female
+        Else ; All participants are male. Make player assume the female role.
+          thread.Participant02.SexType = FG.SexPositions.TokenMMFActor3 	; SecondActorRef is male
+          thread.Participant01.SexType = FG.SexPositions.TokenMMFActor1		; Player is male assuming female role.
+          thread.Participant03.SexType = FG.SexPositions.TokenMMFActor2		; ThirdActorRef is male
+        EndIf		
+      EndIf
+    Else 
+		; Player is female and both participants are female:
+		  If(thread.Participant02.Gender == 1 && thread.Participant03.Gender == 1)
+			  If(Utility.RandomInt(0, 100) <= 50)
+          thread.Participant01.SexType = FG.SexPositions.TokenFFFActor1
+          thread.Participant02.SexType = FG.SexPositions.TokenFFFActor2
+          thread.Participant03.SexType = FG.SexPositions.TokenFFFActor3				
+          thread.Participant01.HideStrapOn = True
+        Else
           thread.Participant03.SexType = FG.SexPositions.TokenFFMActor1
-    			thread.Participant01.SexType = FG.SexPositions.TokenFFMActor2
-    			thread.Participant02.SexType = FG.SexPositions.TokenFFMActor3
-        else ; ALl Male
-          thread.Participant02.SexType = FG.SexPositions.TokenMMFActor3
-  				thread.Participant01.SexType = FG.SexPositions.TokenMMFActor1
-  				thread.Participant03.SexType = FG.SexPositions.TokenMMFActor2
+          thread.Participant01.SexType = FG.SexPositions.TokenFFMActor2			; Player assumes the male role.
+          thread.Participant02.SexType = FG.SexPositions.TokenFFMActor3
+          thread.Participant01.HideStrapOn = False
         EndIf
-  		else
-        thread.Participant01.SexType = FG.SexPositions.TokenMMFActor2
-  			If(thread.Participant02.Gender == 1) ; All Male except 2nd
-  				thread.Participant02.SexType = FG.SexPositions.TokenMMFActor1
-  				thread.Participant03.SexType = FG.SexPositions.TokenMMFActor3
-  			else ; All Male except 3rd
-  				thread.Participant02.SexType = FG.SexPositions.TokenMMFActor3
-  				thread.Participant03.SexType = FG.SexPositions.TokenMMFActor1
-  			EndIf
-  		EndIf
-  	else ; Female 1st
-  		If(thread.Participant02.Gender == thread.Participant03.Gender)
-        If(thread.Participant02.Gender == 1) ; All Female
-          if (Utility.RandomInt(0, 100) <= 50)
-    				thread.Participant01.SexType = FG.SexPositions.TokenFFFActor1
-    				thread.Participant02.SexType = FG.SexPositions.TokenFFFActor2
-    				thread.Participant03.SexType = FG.SexPositions.TokenFFFActor3
-    				thread.Participant01.HideStrapOn = True
-    			else
-    				thread.Participant03.SexType = FG.SexPositions.TokenFFMActor1
-    				thread.Participant01.SexType = FG.SexPositions.TokenFFMActor2
-    				thread.Participant02.SexType = FG.SexPositions.TokenFFMActor3
-    				thread.Participant01.HideStrapOn = False
-    			EndIf
-        else ; Male Partners
-          thread.Participant02.SexType = FG.SexPositions.TokenMMFActor3
-  				thread.Participant01.SexType = FG.SexPositions.TokenMMFActor1
-  				thread.Participant03.SexType = FG.SexPositions.TokenMMFActor2
+      Else
+			  If(thread.Participant02.Gender == 1)
+          thread.Participant03.SexType = FG.SexPositions.TokenFFMActor2		; ThirdActorRef is in the male role
+          thread.Participant01.SexType = FG.SexPositions.TokenFFMActor1		; Player is female.
+          thread.Participant02.SexType = FG.SexPositions.TokenFFMActor3	; SecondActorRef is female.			
+        ElseIF(thread.Participant03.Gender == 1)
+          thread.Participant03.SexType = FG.SexPositions.TokenFFMActor3		; ThirdActorRef is female.
+          thread.Participant01.SexType = FG.SexPositions.TokenFFMActor1		; Player is female.
+          thread.Participant02.SexType = FG.SexPositions.TokenFFMActor2	; SecondActorRef is male.
+        Else
+          thread.Participant02.SexType = FG.SexPositions.TokenMMFActor3 	; SecondActorRef is male
+          thread.Participant01.SexType = FG.SexPositions.TokenMMFActor1		; Player is female.
+          thread.Participant03.SexType = FG.SexPositions.TokenMMFActor2		; ThirdActorRef is male
         EndIf
-  		else
-  			If(thread.Participant02.Gender == 1) ; Female 2nd, male 3rd
-  				thread.Participant03.SexType = FG.SexPositions.TokenFFMActor2
-  				thread.Participant01.SexType = FG.SexPositions.TokenFFMActor1
-  				thread.Participant02.SexType = FG.SexPositions.TokenFFMActor3
-  			else ; Male 2nd, female 3rd
-  				thread.Participant03.SexType = FG.SexPositions.TokenFFMActor3
-  				thread.Participant01.SexType = FG.SexPositions.TokenFFMActor1
-  				thread.Participant02.SexType = FG.SexPositions.TokenFFMActor2
-  			EndIf
-  			; Over-ride the user Strap On option.. flag to turn off.
-  			thread.Participant01.HideStrapOn = True
-  		EndIf
-  	EndIf
-    FG.FollowMeActorRef.Clear()
+        ; Over-ride the user Strap On option.. flag to turn off.
+        thread.Participant01.HideStrapOn = True
+			EndIf
+    EndIf
+    ; Remove the temporary follower
+	  FG.FollowMeActorRef.Clear()
+    ; Clear the faction stuff
     thread.Participant02.GetActorRef().RemoveFromFaction(FG.FlowerGirlsMod.ThreewayFaction)
-    FG.FlowerGirlsConfig.DX_LAST_SCENETYPE.SetValueInt(10)
+	  FG.FlowerGirlsConfig.DX_LAST_SCENETYPE.SetValueInt(10)
+  	bool started = thread.StartScene()	
+    FG.FirstActorRef.Clear()
+    FG.SecondActorRef.Clear()
+    FG.ThirdActorRef.Clear()
+    If(started)
+      return thread
+    Else
+      return none
+    EndIf
   EndIf
-  If(thread.StartScene())
-    FG.FirstActorRef.TryToClear()
-    FG.SecondActorRef.TryToClear()
-    FG.ThirdActorRef.TryToClear()
-    return thread
-  EndIf
-  return none
 EndFunction

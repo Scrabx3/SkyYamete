@@ -158,10 +158,12 @@ Function Stage999()
   int cap = myAliases.length - myActors.length
   While(i < cap)
     Actor that = myAliases[i].GetReference() as Actor
-    If(that && that.HasMagicEffectWithKeyword(bleedoutMarkKW))
+    If(that)
       ; upon exiting Bleedout, they will be teammates again and thus inherit the players Calm Mark
+      If(that.HasMagicEffectWithKeyword(bleedoutMarkKW))
+        Main.BleedOutExit(that, true)
+      EndIf
       that.SetPlayerTeammate(true, true)
-      Main.BleedOutExit(that, true)
       that.RemoveFromFaction(friendFac)
     EndIf
     i += 1

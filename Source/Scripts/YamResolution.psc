@@ -248,7 +248,9 @@ EndFunction
 
 Function Stage1000()
   Actor Player = Game.GetPlayer()
-	Main.standUp(Player)
+  If(plVic.GetReference())
+    Main.standUp(Player)
+  EndIf
 	Utility.Wait(3.3) ; Wait for Getup Animation to be over... zzz
 	GotoState("Stage1000")
   AoEFleeMark.Cast(Player)

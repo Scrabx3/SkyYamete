@@ -22,15 +22,6 @@ EndFunction
 
 ;END FRAGMENT CODE - Do not edit anything between this and the begin comment
 
-;/ NOTE Menu goes
-0 Move on
-1 Claim
-2 Enslave
-4 Open Inventory
-5 Give Potion
-6 Assault
-7 Kill
-/;
 Actor victim = none
 float days = 0.0
 
