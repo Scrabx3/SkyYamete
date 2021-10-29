@@ -73,6 +73,10 @@ Function Maintenance()
   If(!ostimhere)
     MCM.bOStimAllowed = false
   EndIf
+  ; Other Soft Integrations
+  If(Game.GetModByName("SimpleSlavery.esp") == 255)
+    MCM.cSimpleSlavery = 0
+  EndIf
   ; Hostile Faction
   int i = Yam_FriendList.GetSize()
   While(i)
@@ -97,11 +101,40 @@ EndFunction
 ; ----------------- Aftermath
 ;/ TODO this is not setup to handle multiple outcomes /;
 Function PlayerConsequence(int consequence)
-  Debug.Trace("Yamete: Received Event for Player; consequence: " + consequence)
+  Debug.Trace("[Yamete] <Main> Received Event for Player; consequence: " + consequence)
   FadeToBlack.Apply()
-  Utility.Wait(2)
-  FadeToBlack.PopTo(FadeToBlackHold)
-  leftForDead.Start()
+  Utility.Wait(1.7)
+  If(consequence < 0)
+    ; Draw Event
+    int[] weights = MCM.getAllConsequencesPl()
+    int allCells = 0
+    int i = 0
+    While(i < weights.length - 1)
+      allCells += weights[i]
+      i += 1
+    EndWhile
+    If(allCells == 0)
+      consequence = 1
+    else
+      int r = Utility.RandomInt(1, allCells)
+      int w = 0
+      i = 0
+      While(w < r)
+        w += weights[i]
+        i += 1
+      EndWhile
+      consequence = i
+      Debug.Trace("[Yamete] <Main> Draw consequence: " + consequence)
+    EndIf
+  EndIf
+  ; Start Consequence
+  If(consequence == 1)
+    Utility.Wait(2)
+    FadeToBlack.PopTo(FadeToBlackHold)
+    leftForDead.Start()
+  ElseIf(consequence == 2)
+    SendModEvent("SSLV Entry")
+  EndIf
 EndFunction
 
 ; ----------------- Bleedout
@@ -118,18 +151,18 @@ int Function playerBleedout(int consequence)
     If(allCells == 0)
       consequence = 1
     else
-      int room = Utility.RandomInt(1, allCells)
-      int walker = 0
+      int r = Utility.RandomInt(1, allCells)
+      int w = 0
       i = 0
-      While(walker < room)
-        walker += weights[i]
+      While(w < r)
+        w += weights[i]
         i += 1
       EndWhile
       consequence = i
     EndIf
   EndIf
   ; Start Consequence
-  Debug.Trace("[Yamete] Player; Entering Bleedout Type " + consequence)
+  Debug.Trace("[Yamete] <Main> Entering Player Bleedout - Type " + consequence)
   BleedOutEnter(PlayerRef, consequence)
   return consequence
 EndFunction
@@ -162,7 +195,7 @@ int Function npcBleedout(Actor akVictim, int consequence)
     EndIf
   EndIf
   ; Start Consequence
-  Debug.Trace("[Yamete] " + akVictim + " Entering Bleedout Type " + consequence)
+  Debug.Trace("[Yamete] <Main> " + akVictim + " Entering Bleedout Type " + consequence)
   BleedOutEnter(akVictim, consequence)
   return consequence
 EndFunction

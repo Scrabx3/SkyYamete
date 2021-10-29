@@ -175,7 +175,7 @@ bool[] Property bValidRace Auto Hidden ; Initialize: All True
 
 ; --- Consequences
 int cLeftForDead = 100
-
+int Property cSimpleSlavery = 40 Auto Hidden
 ; --- Debug
 ; System
 int Property iPauseKey = -1 Auto Hidden
@@ -221,8 +221,9 @@ EndFunction
 
 ; ===================================== CONSEQUENCES
 int[] Function getAllConsequencesPl()
-	int[] toRet = new int[1]
+	int[] toRet = new int[2]
 	toRet[0] = cLeftForDead
+	toRet[1] = cSimpleSlavery
 	return toRet
 EndFunction
 
@@ -662,9 +663,10 @@ Event OnPageReset(String Page)
 
 	ElseIf(Page == "$Yam_pConsequences")
 		AddTextOptionST("consequenceReadMe", "$Yam_rReadMe", "")
-		AddSliderOptionST("cPlConsequence1", "$Yam_cLeftForDead", cLeftForDead)
+		AddSliderOptionST("conLfD", "$Yam_cLeftForDead", cLeftForDead)
 		SetCursorPosition(1)
 		AddHeaderOption("")
+		AddSliderOptionST("conSS", "$Yam_cSimpleSlavery", cSimpleSlavery, getFlag(Game.GetModByName("SimpleSlavery.esp") != 255))
 
 	ElseIf(Page == "$Yam_pDebug")
 		AddHeaderOption("System")
@@ -1052,8 +1054,13 @@ Event OnSliderOpenST()
 		SetSliderDialogRange(fOtMinD, 180)
 		SetSliderDialogInterval(5)
 
-	ElseIf(option[0] == "cPlConsequence1") ; Consequences
+	ElseIf(option[0] == "conLfD") ; Consequences
 		SetSliderDialogStartValue(cLeftForDead)
+		SetSliderDialogDefaultValue(100)
+		SetSliderDialogRange(0, 100)
+		SetSliderDialogInterval(1)
+	ElseIf(option[0] == "conSS")
+		SetSliderDialogStartValue(cSimpleSlavery)
 		SetSliderDialogDefaultValue(100)
 		SetSliderDialogRange(0, 100)
 		SetSliderDialogInterval(1)
@@ -1201,9 +1208,12 @@ Event OnSliderAcceptST(float value)
 		fOtMaxD = value
 		SetSliderOptionValueST(fOtMaxD)
 
-	ElseIf(option[0] == "cPlConsequence1") ; Consequence
+	ElseIf(option[0] == "conLfD") ; Consequence
 		cLeftForDead = value as int
 		SetSliderOptionValueST(cLeftForDead)
+	ElseIf(option[0] == "conSS")
+		cSimpleSlavery = value as int
+		SetSliderOptionValueST(cSimpleSlavery)
 	EndIf
 EndEvent
 
@@ -2066,6 +2076,7 @@ Function SavingMCM(String filepath)
 
 	; --- Consequences
 	SetIntValue(filePath, "cLeftForDead", cLeftForDead)
+	SetIntValue(filePath, "cSimpleSlavery", cSimpleSlavery)
 
 	; --- Debug
 	SetIntValue(filePath, "iPauseKey", iPauseKey)
@@ -2183,7 +2194,8 @@ Function LoadingMCM(String filepath)
 
 	; --- Consequences
 	cLeftForDead = GetIntValue(filePath, "cLeftForDead")
-
+	cSimpleSlavery = GetIntValue(filePath, "cSimpleSlavery")
+	
 	; --- Debug
 	iPauseKey = GetIntValue(filePath, "iPauseKey")
 EndFunction
