@@ -5,6 +5,7 @@ Event OnInit()
   If(GetReference())
 		mySelf = GetReference() as Actor
 		mySelf.AddSpell(CacheGear)
+    myValidRace = Main.isValidCreature(mySelf)
   EndIf
   consequenceChance = MCM.iRushedConsequence
   profile = 1
@@ -24,6 +25,7 @@ Function ResetGroup(bool expectBleedout)
   EndIf
   Utility.Wait(MCM.iRushedBuffer/2)
   mySelf.RemoveSpell(calmMark)
+  StorageUtil.FormListRemove(Scan, "YamProcessing", mySelf)
   GoToState("")
 EndFunction
 
@@ -35,6 +37,7 @@ Function CleanUp(bool removeMark = true)
   If(mySelf && removeMark)
     mySelf.RemoveSpell(calmMark)
   EndIf
+  StorageUtil.FormListRemove(Scan, "YamProcessing", mySelf)
   GoToState("")
 EndFunction
 

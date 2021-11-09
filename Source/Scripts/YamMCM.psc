@@ -37,9 +37,13 @@ string Property sNotifyColor = "#0000FF" Auto Hidden
 int iShowNotifyColor = 0x0000FF
 
 ; --- Reapers Mercy
-string[] reaperFollowerTreat
+string[] ReaperTargetTreat
 ; Reapers Mercy Ability
 int Property iPlAggrKey = -1 Auto Hidden
+bool Property bRBashOnly = false Auto Hidden
+; Filter
+int Property lReapersCreature = 0 Auto Hidden
+int Property lReaperFollower = 0 Auto Hidden
 ;
 bool Property bOnlyWithReaper = true Auto Hidden
 ; Perks
@@ -47,7 +51,6 @@ bool Property bNoSkilltree = false Auto Hidden
 
 
 ; Valid Targets
-int Property iReaperFollower = 0 Auto Hidden
 bool[] Property bReaperTargets Auto Hidden
 
 ; --- Defeat
@@ -189,7 +192,7 @@ bool AutoSaveMCM = false
 ; =============================	STARTUP // UTILITY
 ; ===============================================================
 int Function GetVersion()
-	return 1
+	return 2
 endFunction
 
 ; ===================================== BLEEDOUTS
@@ -311,10 +314,10 @@ Function Initialize()
 	resRobbedList[2] = "$Yam_robbedList_2" ; By Chance
 
 	; Reapers Mercy
-	reaperFollowerTreat = new string[3]
-	reaperFollowerTreat[0] = "$Yam_reaperTargetFol_0" ; ignore
-	reaperFollowerTreat[1] = "$Yam_reaperTargetFol_1" ; never
-	reaperFollowerTreat[2] = "$Yam_reaperTargetFol_2" ; use settings
+	ReaperTargetTreat = new string[3]
+	ReaperTargetTreat[0] = "$Yam_reaperTarget_0" ; ignore
+	ReaperTargetTreat[1] = "$Yam_reaperTarget_1" ; never
+	ReaperTargetTreat[2] = "$Yam_reaperTarget_2" ; use settings
 
 	; Knockdown Profile
 	KnockdownProfile = new string[3]
@@ -449,11 +452,13 @@ Event OnPageReset(String Page)
 		AddHeaderOption("$Yam_reaperAbility")
 		AddKeyMapOptionST("PlAggrKey", "$Yam_reaperAbilityHotkey", iPlAggrKey)
 		AddTextOptionST("ReapersMercyPowerAdd", "$Yam_reaperAbilityAddRemove", none)
+		AddToggleOptionST("ReaperBashOnly", "$Yam_reaperBashOnly", bRBashOnly)
+		AddHeaderOption("$Yam_reaperConsideration")
+		AddMenuOptionST("ReaperCrtTreatment", "$Yam_ReaperCreature", ReaperTargetTreat[lReapersCreature])
 		SetCursorPosition(1)
 		AddHeaderOption("$Yam_reaperPerks")
 		AddToggleOptionST("ReaperSkilltree", "$Yam_reaperSkilltree", bNoSkilltree)
-		; AddHeaderOption("$Yam_reaperValidTargets")
-		; AddMenuOptionST("reaperFolTreatment", "$Yam_reaperFolTreatment", reaperFollowerTreat[iReaperFollower])
+		; AddMenuOptionST("reaperFolTreatment", "$Yam_ReaperFollower", ReaperTargetTreat[lReaperFollower])
 		; int i = 0
 		; While(i < 5)
 		; 	AddToggleOptionST("reaperNPCValid_" + i, "$Yam_reaperTarget_" + i, bReaperTargets[i])
@@ -564,8 +569,6 @@ Event OnPageReset(String Page)
 		AddSliderOptionST("SLAllowedweight", "$Yam_afFrameSexLabWeight", iSLweight, "{0}", getFlag(SLThere))
 		AddSliderOptionST("FGAllowedweight", "$Yam_afFrameFlowergirlsWeight", iFGweight, "{0}", getFlag(Game.GetModByName("FlowerGirls SE.esm") != 255))
 		AddSliderOptionST("OStimAllowedweight", "$Yam_afFrameOStimWeight", iOStimweight, "{0}", getFlag(OStimThere))
-		; AddEmptyOption()
-		AddEmptyOption()
 		AddHeaderOption("$Yam_afThreads")
 		AddToggleOptionST("afNotify", "$Yam_afAssaultNotify", bNotifyAF)
 		AddToggleOptionST("afNotifyColor", "$Yam_afAssaultNotifyColor", bNotifyColorAF, GetFlag(bNotifyAF))
@@ -666,7 +669,7 @@ Event OnPageReset(String Page)
 		AddSliderOptionST("conLfD", "$Yam_cLeftForDead", cLeftForDead)
 		SetCursorPosition(1)
 		AddHeaderOption("")
-		AddSliderOptionST("conSS", "$Yam_cSimpleSlavery", cSimpleSlavery, getFlag(Game.GetModByName("SimpleSlavery.esp") != 255))
+		AddSliderOptionST("conSS", "$Yam_cSimpleSlavery", cSimpleSlavery, "{0}", getFlag(Game.GetModByName("SimpleSlavery.esp") != 255))
 
 	ElseIf(Page == "$Yam_pDebug")
 		AddHeaderOption("System")
@@ -718,6 +721,9 @@ Event OnSelectST()
 		int i = option[1] as int
 		bReaperTargets[i] = !bReaperTargets[i]
 		SetToggleOptionValueST(bReaperTargets[i])
+	ElseIf(option[0] == "ReaperBashOnly")
+		bRBashOnly = !bRBashOnly
+		SetToggleOptionValueST(bRBashOnly)
 
 	; ElseIf(option[0] == "dBleedImmunity") ; Defeat
 	; 	bleedoutMarkImmunity = !bleedoutMarkImmunity
@@ -970,14 +976,14 @@ Event OnSliderOpenST()
 	ElseIf(option[0] == "KdStaminaThresh")
 		int i = option[1] as int
 		SetSliderDialogStartValue(fStaminaThresh[i] * 100)
-		SetSliderDialogDefaultValue(5)
-		SetSliderDialogRange(0, (fStaminaThresh[i] * 100))
+		SetSliderDialogDefaultValue(40)
+		SetSliderDialogRange(0, 100)
 		SetSliderDialogInterval(1)
 	ElseIf(option[0] == "KdMagickaThresh")
 		int i = option[1] as int
 		SetSliderDialogStartValue(fMagickaThresh[i] * 100)
-		SetSliderDialogDefaultValue(5)
-		SetSliderDialogRange(0, (fMagickaThresh[i] * 100))
+		SetSliderDialogDefaultValue(40)
+		SetSliderDialogRange(0, 100)
 		SetSliderDialogInterval(1)
 	ElseIf(option[0] == "KdVulnerable")
 		int i = option[1] as int
@@ -1236,9 +1242,13 @@ Event OnMenuOpenST()
 		SetMenuDialogOptions(resRobbedList)
 
 	ElseIf(option[0] == "reaperFolTreatment") ; Reaper
-		SetMenuDialogStartIndex(iReaperFollower)
+		SetMenuDialogStartIndex(lReaperFollower)
 		SetMenuDialogDefaultIndex(1)
-		SetMenuDialogOptions(reaperFollowerTreat)
+		SetMenuDialogOptions(ReaperTargetTreat)
+		ElseIf(option[0] == "ReaperCrtTreatment")
+		SetMenuDialogStartIndex(lReapersCreature)
+		SetMenuDialogDefaultIndex(1)
+		SetMenuDialogOptions(ReaperTargetTreat)
 
 	ElseIf(option[0] == "dBleedPotionMenu") ; Knockdown
 		SetMenuDialogStartIndex(iPotionUsage)
@@ -1298,8 +1308,11 @@ Event OnMenuAcceptST(int index)
 		EndIf
 
 	ElseIf(option[0] == "reaperFolTreatment") ; Reaper
-		iReaperFollower = index
-		SetMenuOptionValueST(reaperFollowerTreat[index])
+		lReaperFollower = index
+		SetMenuOptionValueST(ReaperTargetTreat[index])
+	ElseIf(option[0] == "ReaperCrtTreatment") ; Reaper
+		lReapersCreature = index
+		SetMenuOptionValueST(ReaperTargetTreat[index])
 
 	ElseIf(option[0] == "dBleedPotionMenu") ; Knockdown
 		iPotionUsage = index
@@ -1410,7 +1423,11 @@ Event OnHighlightST()
 		SetInfoText("$Yam_resRapeEndlessHighlight")
 
 	ElseIf(option[0] == "reaperFolTreatment") ; Reaper
-		SetInfoText("$Yam_reaperFolTreatmentHighlight")
+		SetInfoText("$Yam_reaperFollowerHighlight")
+	ElseIf(option[0] == "ReaperCrtTreatment")
+		SetInfoText("$Yam_ReaperCreatureHighlight")
+	ElseIf(option[0] == "ReaperBashOnly")
+		SetInfoText("$Yam_reaperBashOnlyHighlight")
 
 	ElseIf(option[0] == "filterType") ; Filter
 		SetInfoText("$Yam_filterTypeHighlight")
@@ -1460,7 +1477,7 @@ Event OnHighlightST()
 	ElseIf(option[0] == "OStimAllowed")
 		SetInfoText("$Yam_afFrameOStimHighlight")
 	ElseIf(option[0] == "OStimAllowedweight")
-		SetInfoText("$Yam_afAssaultNofifyColoWeightHighlight")
+		SetInfoText("$Yam_afFrameOStimWeightHighlight")
 	ElseIf(option[0] == "afNotifyColor")
 		SetInfoText("$Yam_afAssaultNofifyColorHighlight")
 	ElseIf(option[0] == "SLTreatVictim")
@@ -2195,7 +2212,7 @@ Function LoadingMCM(String filepath)
 	; --- Consequences
 	cLeftForDead = GetIntValue(filePath, "cLeftForDead")
 	cSimpleSlavery = GetIntValue(filePath, "cSimpleSlavery")
-	
+
 	; --- Debug
 	iPauseKey = GetIntValue(filePath, "iPauseKey")
 EndFunction

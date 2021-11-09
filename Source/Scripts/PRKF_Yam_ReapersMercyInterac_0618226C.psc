@@ -34,20 +34,14 @@ Function OpenMenu()
 	bool isProtecc = victim.HasKeyword(Protecc)
 	bool isHunter = BlackMarket00.GetStageDone(100)
 	String[] label = new String[8]
-	If(isHunter)
-		label[0] = "Claim"
-	else
-		label[0] = ""
-	EndIf
+	label[0] = "Claim"
 	label[1] = "Open Inventory"
 	label[2] = "Give Potion"
 	label[3] = "Gnade"
 	If(isHunter)
 		label[4] = " Enslave"
-	ElseIf(BlackMarket00.GetStageDone(50))
+	Else
 		label[4] = " Capture"
-	else
-		label[4] = ""
 	EndIf
 	label[5] = "Assault"
 	label[6] = "Kill"
@@ -57,7 +51,7 @@ Function OpenMenu()
 	allow[1] = true
 	allow[2] = Player.GetItemCount(HealingPotions) > 0
 	allow[3] = Player.HasPerk(Gnade) && days <= gGameDaysPassed.Value
-	allow[4] = (!hasType0 && !isEnslaved && !isProtecc) && ((label[4] == " Enslave" && ReapersMercy.availableSlots > 0 && Player.HasPerk(Reaper[1])) || (label[4] == " Capture" && BMCap.GetReference() == none))
+	allow[4] = (!hasType0 && !isEnslaved && !isProtecc) && ((label[4] == " Enslave" && ReapersMercy.availableSlots > 0 && Player.HasPerk(Reaper[1])) || (label[4] == " Capture" && BMCap.GetReference() == none) && BlackMarket00.GetStageDone(50))
 	allow[5] = !hasType0 && (victim.HasKeyword(ActorTypeNPC) || MCM.FrameCreature)
 	allow[6] = !isProtecc
 	allow[7] = true
@@ -84,7 +78,7 @@ Function OpenMenu()
 		healSpell.Cast(Player, victim)
 		days = gGameDaysPassed.Value + 0.5
 	ElseIf(choice == 4) ; Enslave/Capture
-		If(BlackMarket00.IsCompleted())
+		If(isHunter)
 			If(!isClaimed)
 				ReapersMercy.ClaimVictim(victim, true)
 			else
@@ -154,15 +148,17 @@ Event AfterScene(int tid, bool hasPlayer)
 	UnregisterForModEvent("HookAnimationEnd_YamReaperClaimed")
 EndEvent
 Event OStimEnd(string eventName, string strArg, float numArg, Form sender)
+	If(numArg > -2)
+    If(YamOStim.FindActor(victim, numArg as int) == false)
+      return
+    EndIf
+  EndIf
 	PostScene()
 	UnregisterForModEvent("ostim_end")
 EndEvent
 Event OnQuestStop(Quest akQuest)
 	PostScene()
 	PO3_Events_Form.UnregisterForAllQuests(self)
-EndEvent
-Event OnUpdate()
-	PostScene()
 EndEvent
 
 Function PostScene()

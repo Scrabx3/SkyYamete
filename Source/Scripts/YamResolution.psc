@@ -137,14 +137,15 @@ Event AfterScene(int tid, bool hasPlayer)
 EndEvent
 Event OStimEnd(string eventName, string strArg, float numArg, Form sender)
   Debug.Trace("[Yamete] OStim Scene End Main registered on YamResolution")
+  If(numArg > -2)
+    If(YamOStim.FindActor(primVic.GetReference() as Actor, numArg as int) == false)
+      return
+    EndIf
+  EndIf
   continueChain()
 EndEvent
 Event OnQuestStop(Quest akQuest)
   Debug.Trace("[Yamete] FG Scene End registered on YamResolution")
-  continueChain()
-EndEvent
-Event OnUpdate()
-  Debug.Trace("[Yamete] OStim Scene End Sub registered on YamResolution")
   continueChain()
 EndEvent
 

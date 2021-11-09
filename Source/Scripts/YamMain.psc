@@ -84,7 +84,7 @@ Function Maintenance()
     Faction tmpFac = Yam_FriendList.GetAt(i) as Faction
     tmpFac.SetAlly(Yam_FriendFaction, true, true)
   EndWhile
-	;/ TODO Remove this /;
+	; TODO: Remove this
   If(Game.GetModByName("BaboInteractiveDia.esp") != 255)
     baboDia = (Game.GetFormFromFile(0xD58522, "BaboInteractiveDia.esp") as Faction)
   else
@@ -272,6 +272,7 @@ Function BleedOutExit(Actor me, bool simple = false)
 	If(!ScanQ.IsRunning() && !ResoQ.IsRunning())
 		EquipCachedOutfit(me)
 	EndIf
+  StorageUtil.FormListRemove(ScanQ as YamScan, "YamProcessing", me)
   me.EvaluatePackage()
 endFunction
 
@@ -315,6 +316,7 @@ Function RemoveBleedoutMarks(Actor me)
     me.DispelSpell(bleedoutMarks[i])
     i += 1
   EndWhile
+  StorageUtil.FormListRemove(ScanQ as YamScan, "YamProcessing", me)
   me.EvaluatePackage()
 EndFunction
 

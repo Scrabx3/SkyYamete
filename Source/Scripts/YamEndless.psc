@@ -48,14 +48,15 @@ Event AfterScene(int tid, bool hasPlayer)
   startAnimation()
 EndEvent
 Event OStimEnd(string eventName, string strArg, float numArg, Form sender)
+  If(numArg > -2)
+    If(YamOStim.FindActor(sub, numArg as int) == false)
+      return
+    EndIf
+  EndIf
   isAnimating = false
   startAnimation()
 EndEvent
 Event OnQuestStop(Quest akQuest)
-  isAnimating = false
-  startAnimation()
-EndEvent
-Event OnUpdate()
   isAnimating = false
   startAnimation()
 EndEvent

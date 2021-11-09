@@ -17,6 +17,7 @@ Keyword Property bleedoutMarkKW Auto
 ; -------------------------- Variables
 Actor Property mySelf Auto Hidden
 Actor Property aggressor Auto Hidden
+bool Property myValidRace Auto Hidden
 int Property consequenceChance Auto Hidden
 int Property profile Auto Hidden
 int Property repeats Auto Hidden
@@ -32,60 +33,70 @@ EndState
 
 Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile, bool abPowerAttack, bool abSneakAttack, bool abBashAttack, bool abHitBlocked)
   GoToState("Busy")
-  Spell source = akSource as Spell
-  Enchantment enchant = akSource as Enchantment
-  If(source && !source.IsHostile() || enchant && !enchant.IsHostile())
-    GotoState("")
+  Actor myAggr = akAggressor as Actor
+  If(!myAggr || StorageUtil.FormListHas(Scan, "YamProcessing", akAggressor) || StorageUtil.FormListHas(Scan, "YamProcessing", akAggressor))
+    GoToState("")
     return
   EndIf
-  Form[] myItems = Main.getWornItems(mySelf)
-  If(!MCM.bKdStripBlock[profile] || !abHitBlocked)
-    CheckStrip(myItems)
+  If(!StorageUtil.FormListAdd(Scan, "YamProcessing", akAggressor, false))
+    GoToState("")
+    return
+  ElseIf(!StorageUtil.FormListAdd(Scan, "YamProcessing", mySelf, false))
+    StorageUtil.FormListRemove(Scan, "YamProcessing", akAggressor)
+    GoToState("")
+    return
   EndIf
-  Actor myAggr = akAggressor as Actor
-  If(mySelf.IsBleedingOut())
-    If(MCM.bKdEssentialNPC[profile] || (mySelf == PlayerRef && MCM.bKdEssentialPlayer))
+  Spell source = akSource as Spell
+  Enchantment enchant = akSource as Enchantment
+  If((!source || source.IsHostile()) && (!enchant || enchant.IsHostile()))
+    Form[] myItems = Main.getWornItems(mySelf)
+    If(!MCM.bKdStripBlock[profile] || !abHitBlocked)
+      CheckStrip(myItems)
+    EndIf
+    If(mySelf.IsBleedingOut() && MCM.bKdEssentialNPC[profile])
       Utility.Wait(1.8)
       mySelf.AddSpell(calmMark, false)
       mySelf.RestoreActorValue("Health", Math.abs(mySelf.GetActorValue("Health")) + 20)
-      Utility.Wait(3.6)
+      Utility.Wait(3.8)
       If(myAggr != PlayerRef)
-				Aggressor = myAggr
+        Aggressor = myAggr
         EnterKnockdown()
-				return
-			ElseIf(ReaperKnockdown())
-				GotoState("Reaper")
-				return
+        return
+      ElseIf(ReaperKnockdown())
+        GotoState("Reaper")
+        return
       EndIf
       consequenceChance += MCM.iRushedConsequenceAdd
       mySelf.RemoveSpell(calmMark)
-    EndIf
-  ElseIf(myAggr)
-		If(myAggr != PlayerRef)
-	    ; Chance Setting & Knockdown Condition
-	    ;If(GetValidChance(myAggr))
-			If(Utility.RandomFloat(0, 99.5) < MCM.fKDChance[profile])
-				bool blocked = MCM.bKdBlock[profile] && abHitBlocked
-			  bool ranged = MCM.bKdMelee[profile] && (akProjectile != none)
-	      If(!blocked && !ranged && ValidInteraction(myAggr))
-	        If(GetWeakened() || GetExhausted() || GetVulnerable(myItems))
-	          Aggressor = myAggr
-	          EnterKnockdown()
-	          return
-	        EndIf
-				EndIf
-			EndIf
-		Else ; Player Aggressor
-			bool blocked = MCM.bKdBlock[profile] && abHitBlocked && !PlayerRef.HasPerk(pPiercingStrike)
-			If(!blocked && ReaperKnockdown())
-			  If(GetWeakenedReaper() || GetExhausted() || GetVulnerable(myItems))
-					GotoState("Reaper")
-					return
-				EndIf
-			EndIf
+    Else
+      If(myAggr != PlayerRef)
+        ; Chance Setting & Knockdown Condition
+        If(Utility.RandomFloat(0, 99.5) < MCM.fKDChance[profile])
+          bool blocked = MCM.bKdBlock[profile] && abHitBlocked
+          bool ranged = MCM.bKdMelee[profile] && (akProjectile != none)
+          If(!blocked && !ranged && ValidInteraction(myAggr))
+            If(GetWeakened() || GetExhausted() || GetVulnerable(myItems))
+              Aggressor = myAggr
+              EnterKnockdown()
+              return
+            EndIf
+          EndIf
+        EndIf
+      Else ; Player Aggressor
+        bool bashed = !MCM.bRBashOnly || abBashAttack
+        bool blocked = MCM.bKdBlock[profile] && abHitBlocked && !PlayerRef.HasPerk(pPiercingStrike)
+        If(bashed && !blocked && ReaperKnockdown())
+          If(GetWeakenedReaper() || GetExhausted() || GetVulnerable(myItems))
+            GotoState("Reaper")
+            return
+          EndIf
+        EndIf
+      EndIf
     EndIf
   EndIf
   Utility.Wait(0.1)
+  StorageUtil.FormListRemove(Scan, "YamProcessing", akAggressor)
+  StorageUtil.FormListRemove(Scan, "YamProcessing", mySelf)
   GoToState("")
 EndEvent
 
@@ -98,9 +109,9 @@ bool Function ValidInteraction(Actor akAggressor, bool fromBleedout = false)
   If(akAggressor == none || mySelf == none || akAggressor == mySelf)
     Debug.Trace("[Yamete] isValidBase received invalid Argument")
     return false
-  ElseIf(JsonUtil.FormListHas("../Yamete/excluded.json", "actorsAggr", akAggressor) || mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW) || (akAggressor.IsCommandedActor() && !MCM.bSummonAggr))
+  ElseIf(JsonUtil.FormListHas("../Yamete/excluded.json", "actorsAggr", akAggressor) || mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW) || akAggressor.IsDead() || mySelf.IsDead() || (akAggressor.IsCommandedActor() && !MCM.bSummonAggr))
     return false
-  ElseIf(Main.baboDia != none) ;/ TODO remove this /;
+  ElseIf(Main.baboDia != none) ; TODO: Remove this
     If(akAggressor.IsInFaction(Main.baboDia) || mySelf.IsInFaction(Main.baboDia))
       return false
     EndIf
@@ -126,7 +137,7 @@ bool Function ValidInteraction(Actor akAggressor, bool fromBleedout = false)
 			int ar = YamSexLab.GetArousal(akAggressor)
 			aroused = ar >= MCM.iSLArousalThresh && (!isFol || MCM.iSLArousalFollower == 0) || isFol && ar >= MCM.iSLArousalFollower
 		EndIf
-    return Main.isValidGenderCombination(mySelf, akAggressor) && Main.isValidCreature(akAggressor) && aroused
+    return myValidRace && aroused && Main.isValidGenderCombination(mySelf, akAggressor) && Main.isValidCreature(akAggressor)
   else
     return true
   EndIf
@@ -134,14 +145,18 @@ endFunction
 
 ; "ValidInteraction()" equivalent for Player Aggressor
 bool Function ReaperKnockdown()
-	If(!mySelf || mySelf == PlayerRef || MCM.bOnlyWithReaper && !PlayerRef.HasSpell(ReapersMercy))
+	If(!mySelf || mySelf == PlayerRef || !PlayerRef.HasSpell(ReapersMercy))
 		return false
 	ElseIf(mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW))
 		return false
-	ElseIf(Main.baboDia != none) ;/ TODO remove this /;
+	ElseIf(Main.baboDia != none) ; TODO: Remove this
 		If(PlayerRef.IsInFaction(Main.baboDia) || mySelf.IsInFaction(Main.baboDia))
 			return false
 		EndIf
+  ElseIf(MCM.lReapersCreature == 0 || MCM.lReapersCreature == 2 && !myValidRace)
+    return false
+  ; ElseIf(MCM.lReapersCreature == 0 || MCM.lReapersCreature == 2 && !Main.isValidCreature(akAggressor))
+  ;   return false
 	EndIf
 	return true
 EndFunction
@@ -168,37 +183,29 @@ EndFunction
 Function CheckStrip(Form[] wornItems)
   If(Utility.RandomInt(0, 99) < MCM.iKdStrip[profile] && wornItems)
 		Form item = wornItems[Utility.RandomInt(0, (wornItems.Length - 1))]
-    If(Utility.RandomInt(0, 99) < MCM.iKdStripDstry[profile] && canDestroy(item))
+    bool canDestroy = !(MCM.iKdStripProtect && (item.HasKeyword(DaedricArtifact) || JsonUtil.FormListHas("../Yamete/excluded.json", "items", item)))
+    If(Utility.RandomInt(0, 99) < MCM.iKdStripDstry[profile] && canDestroy)
       mySelf.RemoveItem(item, abSilent = true)
       If(mySelf == PlayerRef && MCM.bShowNotifyStrip)
         string tmp = item.GetName()
         If(MCM.bShowNotifyColor)
           Debug.Notification("<font color='" + MCM.sNotifyColor + "'>" + tmp + " got teared off and destroyed")
-        else
+        Else
           Debug.Notification(tmp + " got teared off and destroyed")
         EndIf
       EndIf
-    else
+    Else
       If(MCM.bKdStripDrop[profile])
 				mySelf.DropObject(item)
-      else
+      Else
         mySelf.UnequipItem(item, abSilent = true)
       EndIf
     EndIf
   EndIf
 EndFunction
 
-bool Function canDestroy(Form item)
-  return !(MCM.iKdStripProtect && (item.HasKeyword(DaedricArtifact) || JsonUtil.FormListHas("../Yamete/excluded.json", "items", item)))
-EndFunction
-
 Function EnterKnockdown()
-	If(MCM.iCombatScenario == 1)
-		GoToState("Traditional")
-	else
-		GoToState("Rushed")
-	EndIf
-	If(MCM.bShowNotifyKD)
+  If(MCM.bShowNotifyKD)
 		string myName = mySelf.GetLeveledActorBase().GetName()
 		string otherName = Aggressor.GetLeveledActorBase().GetName()
 		If(MCM.bShowNotifyColor)
@@ -207,6 +214,11 @@ Function EnterKnockdown()
 			Debug.Notification(myName + " got knocked out by" + otherName)
 		EndIf
 	EndIf
+	If(MCM.iCombatScenario == 1)
+		GoToState("Traditional")
+	else
+		GoToState("Rushed")
+	EndIf
 EndFunction
 
 ; ======================================================================
@@ -214,6 +226,7 @@ EndFunction
 ; ======================================================================
 State Reaper
 	Event OnBeginState()
+    StorageUtil.FormListRemove(Scan, "YamProcessing", aggressor)
 		Debug.Trace("[Yamete] Enter Reaper on " + GetName())
 		RM.AddXp(2)
 		If(RM.AnculoRank > 0 && Utility.RandomInt(0, 99) < (5 + RM.AnculoRank * 5))
@@ -247,9 +260,8 @@ State Rushed
     If(!PO3_SKSEFunctions.HasMagicEffectWithArchetype(aggressor, "Frenzy") && a > 0)
       aggressor.AddSpell(calmMark, false)
       aggressor.SetRestrained(true)
-      aggressor.KeepOffsetFromActor(mySelf, 0.0, 0.0, 20.0, afCatchUpRadius = 300.0, afFollowRadius = 150.0)
       Utility.Wait(3.4) ; Some time to allow this Actor to be rescued
-      If(!mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW) || mySelf.IsDead())
+      If(!mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW) || mySelf.IsDead() || aggressor.IsDead())
         clearAggressor()
         ResetGroup(true)
         return
@@ -281,16 +293,17 @@ State Rushed
     UnregisterForModEvent("HookAnimationEnding_" + GetName())
   EndEvent
   Event OStimEnd(string eventName, string strArg, float numArg, Form sender)
+    If(numArg > -2)
+      If(YamOStim.FindActor(mySelf, numArg as int) == false)
+        return
+      EndIf
+    EndIf
     EnterBleedout(true)
     UnregisterForModEvent("ostim_end")
   EndEvent
   Event OnQuestStop(Quest akQuest)
     EnterBleedout(true)
     PO3_Events_Alias.UnregisterForAllQuests(self)
-  EndEvent
-  Event OnUpdate()
-    ; Debug.MessageBox("[Yamete] OnUpdate() on " + (GetReference() as Actor).GetLeveledActorBase().GetName())
-    EnterBleedout(true)
   EndEvent
 
   Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile, bool abPowerAttack, bool abSneakAttack, bool abBashAttack, bool abHitBlocked)
@@ -302,6 +315,11 @@ EndState
 Otherwise stack Consequence and reset the Actor to default /;
 Function EnterBleedout(bool fromScene)
   Debug.Trace("[Yamete] Rushed: YamScanReferences.EnterBleed() on " + GetName() + " -> fromScene: " + fromScene)
+  If(!mySelf.Is3DLoaded())
+    ResetGroup(!fromScene)
+    clearAggressor()
+    return
+  EndIf
   If(fromScene && Utility.RandomInt(0, 99) < MCM.iResNextRoundChance && (MCM.iResMaxRounds > repeats || MCM.iResMaxRounds == 0))
     Main.BleedOutEnter(mySelf, 0)
     Actor[] partners = PapyrusUtil.ActorArray(1, aggressor)
@@ -348,6 +366,11 @@ EndState
 ; ======================================================================
 ; ================================== MISC
 ; ======================================================================
+Event OnCellDetach()
+  Debug.SendAnimationEvent(mySelf, "staggerStart")
+  CleanUp()
+EndEvent
+
 Event OnDying(Actor akKiller)
   If(aggressor)
     clearAggressor()
@@ -359,13 +382,13 @@ Event OnDying(Actor akKiller)
 EndEvent
 
 Function clearAggressor()
-	aggressor.ClearKeepOffsetFromActor()
-	aggressor.SetRestrained(false)
-	aggressor.RemoveSpell(calmMark)
-	If(aggressor.IsInFaction(Main.PlayerFollowerFaction))
-		aggressor.SetPlayerTeammate(true, true)
-	EndIf
-	aggressor = none
+  aggressor.SetRestrained(false)
+  aggressor.RemoveSpell(calmMark)
+  If(aggressor.IsInFaction(Main.PlayerFollowerFaction))
+    aggressor.SetPlayerTeammate(true, true)
+  EndIf
+  StorageUtil.FormListRemove(Scan, "YamProcessing", Aggressor)
+  aggressor = none
 EndFunction
 
 ; ======================================================================

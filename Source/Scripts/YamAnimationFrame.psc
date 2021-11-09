@@ -72,7 +72,7 @@ EndFunction
 • 0 ~ 14 -> SexLab
 • 15 -> Flowergirls
 • 16 -> OStim, Mainthread
-• 17 -> OStim, Subthread /;
+/;
 ; =========================================================== GENERIC
 int Function StartAnimationWithPlayer(YamMCM MCM, Actor other, int asVictim = 1) global
   Actor[] others = PapyrusUtil.ActorArray(1, other)
@@ -103,20 +103,14 @@ int Function StartAnimation(YamMCM MCM, Actor victim, Actor[] partners, Form sou
       else
         int nextChamber = Utility.RandomInt(0, chamber2)
         If(nextChamber < chamber0) ; OStim
-          float tmp = YamOStim.StartScene(MCM, victim, partners, asVictim)
-          If(tmp == -1.0)
-            frames[0] = 0
-            repeats += 1
-          ElseIf(tmp == 0.0)
+          If(YamOStim.StartScene(MCM, victim, partners, asVictim))
             If(source)
               source.RegisterForModEvent("ostim_end", "OStimEnd")
             EndIf
             sol = 16
           Else
-            If(source)
-              source.RegisterForSingleUpdate(tmp)
-            EndIf
-            sol = 17
+            frames[0] = 0
+            repeats += 1
           EndIf
         ElseIf(nextChamber < chamber1) ; FG
           If(YamFlowerGirls.StartSceneForm(victim, partners, source))
@@ -179,16 +173,12 @@ int Function StartSceneRushed(YamMCM MCM, ReferenceAlias source, Actor[] partner
       else
         int nextChamber = Utility.RandomInt(0, chamber2)
         If(nextChamber < chamber0) ; OStim
-          float tmp = YamOStim.StartScene(MCM, victim, partners, 1)
-          If(tmp == -1.0)
-            frames[0] = 0
-            repeats += 1
-          ElseIf(tmp == 0.0)
+          If(YamOStim.StartScene(MCM, victim, partners, 1))
             source.RegisterForModEvent("ostim_end", "OStimEnd")
             sol = 16
           Else
-            source.RegisterForSingleUpdate(tmp)
-            sol = 17
+            frames[0] = 0
+            repeats += 1
           EndIf
         ElseIf(nextChamber < chamber1) ; FG
           If(YamFlowerGirls.StartSceneAlias(victim, partners, source))

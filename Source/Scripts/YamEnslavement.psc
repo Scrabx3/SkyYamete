@@ -17,7 +17,23 @@ Event OnInit()
 EndEvent
 
 ; ======================================================================
-; ================================== INTERACTION
+; ================================== UTILITY
+; ======================================================================
+; Find the Alias Slot this Victim belongs to
+int Function findVictim(ObjectReference that)
+	int i = 0
+	While(i < Victims.length)
+		ObjectReference tmp = Victims[i].GetReference()
+		If(tmp == that)
+			return i
+		EndIf
+		i += 1
+	EndWhile
+	return -1
+EndFunction
+
+; ======================================================================
+; ================================== DIALOGUE
 ; ======================================================================
 Function SetOutfit(Actor that)
 	int slot = findVictim(that)
@@ -50,21 +66,6 @@ Function SetOutfit(Actor that)
 EndFunction
 
 ; ======================================================================
-; ================================== UTILITY
-; ======================================================================
-int Function findVictim(ObjectReference that)
-	int i = 0
-	While(i < Victims.length)
-		ObjectReference tmp = Victims[i].GetReference()
-		If(tmp == that)
-			return i
-		EndIf
-		i += 1
-	EndWhile
-	return -1
-EndFunction
-
-; ======================================================================
 ; ================================== SLOT MANAGEMENT
 ; ======================================================================
 Function ClaimVictim(Actor victim, bool enslave = false)
@@ -83,7 +84,7 @@ Function ClaimVictim(Actor victim, bool enslave = false)
 	Debug.Trace("[Yamete] Claimed " + victim)
 EndFunction
 
-;/ NOTE This is expected to always be called on a claimed Victim /;
+; Adds a Victim into one of the Enslavement Slots
 Function EnslaveVictim(Actor victim)
 	int i = findVictim(none)
 	If(i != -1)
@@ -115,6 +116,7 @@ Function EnslaveVictim(Actor victim)
 	EndIf
 EndFunction
 
+; Remove this Victim from its Enslavement Slot. It will run away afterwards
 bool Function ReleaseVictim(Actor that)
 	int slot = findVictim(that)
 	If(slot < 0)

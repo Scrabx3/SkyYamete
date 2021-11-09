@@ -6,6 +6,7 @@ int resiliance
 
 Event OnInit()
   mySelf = PlayerRef
+  myValidRace = true
   consequenceChance = MCM.iRushedConsequence
   profile = 0
   Aggressor = none
@@ -24,6 +25,7 @@ Function ResetGroup(bool expectBleedout)
   If(expectBleedout) ; Bleedout here should be Type 0
     Main.standUp(mySelf)
   EndIf
+  StorageUtil.FormListRemove(Scan, "YamProcessing", mySelf)
 EndFunction
 
 ; Clear this Slot, reset the Actor if necessary
@@ -34,6 +36,7 @@ Function CleanUp(bool removeMark = true)
   If(removeMark)
     mySelf.RemoveSpell(calmMark)
   EndIf
+  StorageUtil.FormListRemove(Scan, "YamProcessing", mySelf)
   GoToState("")
 EndFunction
 
