@@ -72,6 +72,9 @@ Function Maintenance()
   bool ostimhere = Game.GetModByName("OStim.esp") != 255
   If(!ostimhere)
     MCM.bOStimAllowed = false
+  ElseIf(YamOStim.GetVersion() < 26)
+    MCM.bOStimAllowed = false
+    Debug.MessageBox("Yamete! requires OStim API Version 26 or higher. Your Version is: " + YamOStim.GetVersion())
   EndIf
   ; Other Soft Integrations
   If(Game.GetModByName("SimpleSlavery.esp") == 255)

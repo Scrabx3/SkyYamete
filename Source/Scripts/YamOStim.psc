@@ -14,6 +14,10 @@ bool Function FindActor(Actor that, int ID) global
   return false
 EndFunction
 
+int Function GetVersion() global
+  return OUtils.GetOstim().GetAPIVersion()
+EndFunction
+
 ; ======================================================================
 ; ================================== ANIMATION
 ; ======================================================================
