@@ -76,8 +76,9 @@ Event OnStoryScript(Keyword akKeyword, Location akLocation, ObjectReference akRe
   ; A fitting Victoire is considered a Victoire which is of valid Gender and Race and has a valid Action associated with it
   ; ========
   ; Get primary Victim, primary Victoire & Action.. starting with the Player if present
+  ObjectReference PlV = plVic.GetReference()
 	If(aiValue1 == 0)
-		If(!GetNearestVictoireMain(plVic.GetReference() as Actor))
+		If(!GetNearestVictoireMain(PlV as Actor))
 	    int i = 0
 	    While(!GetNearestVictoireMain(victims[i].GetReference() as Actor) && (i < victims.length - 1))
 	      i += 1
@@ -93,6 +94,9 @@ Event OnStoryScript(Keyword akKeyword, Location akLocation, ObjectReference akRe
     SetStage(1000)
     return
   Else
+    If(!PlV)
+      Main.BleedOutExit(Game.GetPlayer(), true)
+    EndIf
 		DisableDialogue = aiValue2
     SetStage((10 * primAction) + 20)
   EndIf

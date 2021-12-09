@@ -62,6 +62,7 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
     EndIf
   EndIf
   Actor caster = GetCasterActor()
+  caster.AddToFaction(Yam_FriendFaction)
   caster.StopCombat()
   caster.StopCombatAlarm()
 EndEvent

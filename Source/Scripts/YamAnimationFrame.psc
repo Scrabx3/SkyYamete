@@ -212,3 +212,61 @@ int Function StartSceneRushed(YamMCM MCM, ReferenceAlias source, Actor[] partner
   EndIf
   return sol
 EndFunction
+
+; =========================================================== SURRENDER
+int Function StartSceneSurrender(YamMCM MCM, Actor[] positions, Actor victim, String tags, Form source) global
+  If(!MCM.bSLScenes)
+    Debug.Notification("Imagine a Scene to start here")
+    return -1
+  EndIf
+  int sol = -1
+  If(!positions[1].HasKeyword(Keyword.GetKeyword("ActorTypeNPC")))
+    sol = YamSexLab.StartAnimationCustom(positions, victim, tags, "YamSurrender")
+  Else
+    int[] frames = MCM.getFrameWeights()
+    int repeats = 0
+    While(repeats < 3 && sol == -1)
+      int chamber0 = frames[0]
+      int chamber1 = chamber0 + frames[1]
+      int chamber2 = chamber1 + frames[2]
+      If(chamber2 == 0)
+        return -1
+      else
+        int nextChamber = Utility.RandomInt(0, chamber2)
+        If(nextChamber < chamber0) ; OStim
+          If(YamOStim.StartSceneCustom(positions, victim != none))
+            If(source)
+              source.RegisterForModEvent("ostim_end", "OStimEnd")
+            EndIf
+            sol = 16
+          Else
+            frames[0] = 0
+            repeats += 1
+          EndIf
+        ElseIf(nextChamber < chamber1) ; FG
+          victim = positions[0]
+          Actor[] partners = new Actor[2]
+          partners[0] = positions[1]
+          partners[1] = positions[2]
+          If(YamFlowerGirls.StartSceneForm(victim, partners, source))
+            ; Register Event in YamFlowerGirls since this Script has no access to the FG Quests..
+            sol = 15
+          else
+            frames[1] = 0
+            repeats += 1
+          EndIf
+        Else ; SL
+          int tmp = YamSexLab.StartAnimationCustom(positions, victim, tags, "YamSurrender")
+          If(tmp == -1)
+            frames[2] = 0
+            repeats += 1
+          else
+            ; Register for SL Events in the calling Script, doesnt work otherwise..
+            sol = tmp
+          EndIf
+        EndIf
+      EndIf
+    EndWhile
+  EndIf
+  return sol
+EndFunction

@@ -53,12 +53,13 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
     If(!MCM.bKdStripBlock[profile] || !abHitBlocked)
       CheckStrip(myItems)
     EndIf
-    If(mySelf.IsBleedingOut() && MCM.bKdEssentialNPC[profile])
+    float myHp = Math.abs(mySelf.GetActorValue("Health"))
+    If(mySelf.IsBleedingOut() && MCM.bKdEssentialNPC[profile] && myHp < 0)
       Utility.Wait(1.8)
       mySelf.AddSpell(calmMark, false)
-      mySelf.RestoreActorValue("Health", Math.abs(mySelf.GetActorValue("Health")) + 20)
+      mySelf.RestoreActorValue("Health", myHp + 20)
       Utility.Wait(3.8)
-      If(myAggr != PlayerRef)
+      If(myAggr != PlayerRef && ValidInteraction(myAggr, true))
         Aggressor = myAggr
         EnterKnockdown()
         return
@@ -85,8 +86,13 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
       Else ; Player Aggressor
         bool bashed = !MCM.bRBashOnly || abBashAttack
         bool blocked = MCM.bKdBlock[profile] && abHitBlocked && !PlayerRef.HasPerk(pPiercingStrike)
+        ; Debug.Trace("[YAMETE] - CHECKING PLAYER HIT;; bashed = " + bashed + ";; blocked = " + blocked + ";; abBashAttack = " + abBashAttack + ";; bashOnly = " + MCM.bRBashOnly)
         If(bashed && !blocked && ReaperKnockdown())
-          If(GetWeakenedReaper() || GetExhausted() || GetVulnerable(myItems))
+          bool weak = GetWeakenedReaper()
+          bool exhausted = GetExhausted()
+          bool vulnerable = GetVulnerable(myItems)
+          ; Debug.Trace("[YAMETE] - CHECKING PLAYER HIT;; weak = " + weak + ";; exhausted = " + Exhausted + ";; vulnerable = " + vulnerable)
+          If(weak || exhausted || vulnerable)
             GotoState("Reaper")
             return
           EndIf
@@ -109,7 +115,7 @@ bool Function ValidInteraction(Actor akAggressor, bool fromBleedout = false)
   If(akAggressor == none || mySelf == none || akAggressor == mySelf)
     Debug.Trace("[Yamete] isValidBase received invalid Argument")
     return false
-  ElseIf(JsonUtil.FormListHas("../Yamete/excluded.json", "actorsAggr", akAggressor) || mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW) || akAggressor.IsDead() || mySelf.IsDead() || (akAggressor.IsCommandedActor() && !MCM.bSummonAggr))
+  ElseIf(JsonUtil.FormListHas("../Yamete/excluded.json", "actorsAggr", akAggressor) || mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW) || akAggressor.IsDead() || mySelf.IsDead() || (akAggressor.IsCommandedActor() && !MCM.bSummonAggr) || (akAggressor.GetRace() == Main.ElderRace && !MCM.bElderAggr))
     return false
   ElseIf(Main.baboDia != none) ; TODO: Remove this
     If(akAggressor.IsInFaction(Main.baboDia) || mySelf.IsInFaction(Main.baboDia))
@@ -146,14 +152,18 @@ endFunction
 ; "ValidInteraction()" equivalent for Player Aggressor
 bool Function ReaperKnockdown()
 	If(!mySelf || mySelf == PlayerRef || !PlayerRef.HasSpell(ReapersMercy))
+    ; Debug.Trace("[YAMETE] - PLAYER GOT NO SPELL")
 		return false
-	ElseIf(mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW))
+	ElseIf(mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW) || mySelf.IsDead())
+    ; Debug.Trace("[YAMETE] - VICTIM BLEEDOUT")
 		return false
 	ElseIf(Main.baboDia != none) ; TODO: Remove this
 		If(PlayerRef.IsInFaction(Main.baboDia) || mySelf.IsInFaction(Main.baboDia))
+      ; Debug.Trace("[YAMETE] - BABO PROTECCT")
 			return false
 		EndIf
-  ElseIf(MCM.lReapersCreature == 0 || MCM.lReapersCreature == 2 && !myValidRace)
+  ElseIf(!mySelf.HasKeyword(Main.ActorTypeNPC) && (MCM.lReapersCreature == 0 || MCM.lReapersCreature == 2 && !myValidRace))
+    ; Debug.Trace("[YAMETE] - INVALID CREATURE FILTER BLEEDOUT")
     return false
   ; ElseIf(MCM.lReapersCreature == 0 || MCM.lReapersCreature == 2 && !Main.isValidCreature(akAggressor))
   ;   return false
@@ -173,11 +183,11 @@ bool Function GetWeakenedReaper()
 EndFunction
 
 bool Function GetVulnerable(Form[] wornItems)
-  return wornItems.length < MCM.iKdVulnerable[profile]
+  return mySelf.HasKeyword(Main.ActorTypeNPC) && wornItems.length < MCM.iKdVulnerable[profile]
 EndFunction
 
 bool Function GetExhausted()
-  return mySelf.GetActorValuePercentage("Stamina") < MCM.fStaminaThresh[profile] && mySelf.GetActorValuePercentage("Magicka") < MCM.fMagickaThresh[profile]
+  return mySelf.GetActorValuePercentage("Stamina") < MCM.fStaminaThresh[profile] || mySelf.GetActorValuePercentage("Magicka") < MCM.fMagickaThresh[profile]
 EndFunction
 
 Function CheckStrip(Form[] wornItems)
@@ -257,7 +267,7 @@ State Rushed
     mySelf.AddSpell(calmMark, false)
     int a = Main.getResolutionAction(aggressor, mySelf)
 		Debug.Trace("[Yamete] Rushed Resolution Choice for " + GetName() + ": " + a)
-    If(!PO3_SKSEFunctions.HasMagicEffectWithArchetype(aggressor, "Frenzy") && a > 0)
+    If(aggressor.GetActorValue("Aggression") < 4 && a > 0)
       aggressor.AddSpell(calmMark, false)
       aggressor.SetRestrained(true)
       Utility.Wait(3.4) ; Some time to allow this Actor to be rescued
@@ -377,6 +387,10 @@ Event OnDying(Actor akKiller)
   EndIf
   If(GetName() != "Combatant0")
     Clear()
+  Else
+    ResetGroup(false)
+    GoToState("Busy")
+    return
   EndIf
   GoToState("")
 EndEvent

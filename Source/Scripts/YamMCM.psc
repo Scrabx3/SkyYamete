@@ -22,11 +22,15 @@ int Property iClockOutChance = 100 Auto Hidden
 bool Property bCheckHostility = true Auto Hidden
 int Property iMaxDistance = 60 Auto Hidden
 GlobalVariable Property SummonVicGl Auto
+GlobalVariable Property EnderVicGl Auto 
 bool Property bSummonAggr = false Auto Hidden
+bool Property bElderAggr = false Auto Hidden
 ; Importance
 string[] importanceOptions
 int Property iImportance = 2 Auto Hidden
 bool Property bImportantFollowers = true Auto Hidden
+; Surrender
+int Property iSurrenderKey = -1 Auto Hidden
 ; Miscellaneous
 bool Property bCustomBleed = false Auto Hidden
 bool Property bShowNotifyKD = false Auto Hidden
@@ -424,6 +428,7 @@ Event OnPageReset(String Page)
 		Page = "$Yam_pGeneral"
 	EndIf
 
+
 	If(Page == "$Yam_pGeneral")
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		AddHeaderOption("$Yam_genCombatQ")
@@ -432,6 +437,8 @@ Event OnPageReset(String Page)
 		AddSliderOptionST("checkDistance", "$Yam_genCombatQDistance", iMaxDistance, "{0}m")
 		AddToggleOptionST("summonedVic", "$Yam_genSummonVic", SummonVicGl.Value as bool)
 		AddToggleOptionST("summonedAgg", "$Yam_genSummonAgg", bSummonAggr)
+		AddToggleOptionST("elderVic", "$Yam_genElderVic", EnderVicGl.Value as bool)
+		AddToggleOptionST("elderAgg", "$Yam_genElderAgg", bElderAggr)
 		AddHeaderOption("$Yam_cImportance")
 		AddMenuOptionST("cNPCimportance", "$Yam_cNPCImportance", importanceOptions[iImportance])
 		AddToggleOptionST("cNPCimportanceFol", "$Yam_cNPCFollowerImportance", bImportantFollowers)
@@ -439,6 +446,8 @@ Event OnPageReset(String Page)
 		AddHeaderOption("$Yam_genStatus")
 		AddTextOption(GetStatus(), none)
 		AddEmptyOption()
+		AddHeaderOption("$Yam_genSurrender")
+		AddKeyMapOptionST("SurrenderKey", "$Yam_SurrenderKey", iSurrenderKey)
 		AddHeaderOption("$Yam_genMisc")
 		AddToggleOptionST("CustomBleed", "$Yam_genBleedoutAnim", bCustomBleed)
 		AddHeaderOption("$Yam_genNotify")
@@ -713,6 +722,14 @@ Event OnSelectST()
 	ElseIf(option[0] == "summonedAgg")
 		bSummonAggr = !bSummonAggr
 		SetToggleOptionValueST(bSummonAggr)
+	ElseIf(option[0] == "elderVic")
+		bool tmp = EnderVicGl.Value as float
+		tmp = !tmp
+		EnderVicGl.Value = tmp as float
+		SetToggleOptionValueST(tmp)
+	ElseIf(option[0] == "elderAgg")
+		bElderAggr = !bElderAggr
+		SetToggleOptionValueST(bElderAggr)		
 
 	ElseIf(option[0] == "ReaperSkilltree") ; Reaper
 		bNoSkilltree = !bNoSkilltree
@@ -1359,6 +1376,10 @@ Event OnHighlightST()
 		SetInfoText("$Yam_genSummonVicHighlight")
 	ElseIf(option[0] == "summonedAgg")
 		SetInfoText("$Yam_genSummonAggHighlight")
+	ElseIf(option[0] == "elderVic")
+		SetInfoText("$Yam_genElderVicHighlight")
+	ElseIf(option[0] == "elderAgg")
+		SetInfoText("$Yam_genElderAggHighlight")
 	ElseIf(option[0] == "CustomBleed")
 		SetInfoText("$Yam_genBleedoutAnimHighlight")
 	ElseIf(option[0] == "cNPCimportance")
@@ -1594,6 +1615,44 @@ int Function ColorNotifyChoice()
 EndFunction
 
 ; ===============================================================
+; =============================	SURRENDER
+; ===============================================================
+State SurrenderKey
+	event OnKeyMapChangeST(int newKeyCode, string conflictControl, string conflictName)
+		If(newKeyCode == 1)
+			Main.UnregisterForKey(iPlAggrKey)
+			iSurrenderKey = -1
+			SetKeyMapOptionValueST(iPlAggrKey)
+			return
+		EndIf
+		bool continue = true
+		if(conflictControl != "")
+			string msg
+			if(conflictName != "")
+				msg = "This key is already mapped to:\n\"" + conflictControl + "\"\n(" + conflictName + ")\n\nAre you sure you want to continue?"
+			else
+				msg = "This key is already mapped to:\n\"" + conflictControl + "\"\n\nAre you sure you want to continue?"
+			endIf
+			continue = ShowMessage(msg, true, "$Yes", "$No")
+		endIf
+			if (continue)
+				Main.UnregisterForKey(iSurrenderKey)
+				iSurrenderKey = newKeyCode
+				SetKeyMapOptionValueST(iSurrenderKey)
+				Main.RegisterForKey(iSurrenderKey)
+			endIf
+		endEvent
+	event OnDefaultST()
+		Main.UnregisterForKey(iSurrenderKey)
+		iSurrenderKey = -1
+		SetKeyMapOptionValueST(iSurrenderKey)
+	endEvent
+	event OnHighlightST()
+		SetInfoText("$Yam_SurrenderKeyHighlight")
+	endEvent
+EndState
+
+; ===============================================================
 ; =============================	REAPERS MERCY
 ; ===============================================================
 State PlAggrKey
@@ -1623,9 +1682,8 @@ State PlAggrKey
 		endEvent
 	event OnDefaultST()
 		Main.UnregisterForKey(iPlAggrKey)
-		iPlAggrKey = 34
+		iPlAggrKey = -1
 		SetKeyMapOptionValueST(iPlAggrKey)
-		Main.RegisterForKey(iPlAggrKey)
 	endEvent
 	event OnHighlightST()
 		SetInfoText("$Yam_reaperAbilityHotkeyHighlight")
@@ -2248,11 +2306,18 @@ int[] Function boolToIntArray(bool[] myArr)
 	return toRet
 EndFunction
 
-string Function IntToString(int x)
-  string color = PO3_SKSEFunctions.IntToString(x, true)
-  color = StringUtil.Substring(color, 2)
-  While(StringUtil.GetLength(color) < 6)
-    color = "0" + color
+String Function IntToString(int x)
+	String hex = ""
+  While(x != 0)
+		int c = x % 16
+		If(c < 10)
+			hex += c
+		Else
+			hex += StringUtil.AsChar(55 + c)
+		EndIf
+	EndWhile
+  While(StringUtil.GetLength(hex) < 6)
+    hex = "0" + hex
   EndWhile
-  return "#" + color
+  return "#" + hex
 EndFunction

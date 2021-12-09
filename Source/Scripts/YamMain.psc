@@ -6,12 +6,14 @@ Actor Property PlayerRef Auto
 FormList Property Yam_FriendList Auto
 Quest Property ScanQ Auto
 Quest Property ResoQ Auto
+Quest Property SurrenderQ Auto
 Spell Property ReapersMercy Auto
 Spell[] Property bleedoutMarks Auto
 Faction Property Yam_FriendFaction Auto
 Faction Property PlayerFollowerFaction Auto
 Faction[] Property BanditFactions Auto
 Race[] Property raceList Auto
+Race Property ElderRace Auto
 Keyword Property ActorTypeNPC Auto
 Keyword Property EndlessSceneKW Auto
 Keyword Property bleedoutMarkTemporary Auto
@@ -21,6 +23,7 @@ ImageSpaceModifier Property FadeToBlackBack Auto
 Idle Property StealingIdle Auto
 Idle[] Property killMoves Auto
 Weapon Property SteelDagger Auto
+Message Property SurrenderCantSurrender Auto
 ; --- Consequences
 Quest Property leftForDead Auto
 ; -------------------------- Variables
@@ -693,6 +696,10 @@ Event OnKeyDown(int KeyCode)
       EndIf
     else
       Debug.Notification("Yamete! unpaused")
+    EndIf
+  ElseIf(KeyCode == MCM.iSurrenderKey)
+    If(!SurrenderQ.Start())
+      SurrenderCantSurrender.Show()
     EndIf
   EndIf
 EndEvent

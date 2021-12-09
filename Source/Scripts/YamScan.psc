@@ -60,7 +60,7 @@ Event OnUpdate()
     int i = (b.HasKeyword(Yam_Scan_InUse) || b.IsInFaction(exclusionFac)) as int
     While(i < myBullets.length)
       b = myBullets[i].GetReference() as Actor
-      If(b != none)
+      If(b != none && ((b.GetRace() == Main.ElderRace) as int <= MCM.EnderVicGl.Value) && (b.IsCommandedActor() as int <= MCM.SummonVicGl.Value))
         int freeSlot = GetFreeSlot()
         If(freeSlot > -1)
           myActors[freeSlot].ReFill(b)
@@ -151,7 +151,9 @@ Function Stage999()
   Debug.Trace("[Yamete] Scan: SetStage 999")
   If(PlayerRef.HasMagicEffectWithKeyword(bleedoutMarkKW))
     PlayerRef.AddSpell(calmMark, false)
-    myAliases[0].GotoState("Exhausted")
+    If(!Main.SurrenderQ.IsRunning())
+      myAliases[0].GotoState("Exhausted")
+    EndIf
     Main.BleedOutExit(PlayerRef, true)
   EndIf
   int i = 1
@@ -168,7 +170,11 @@ Function Stage999()
     EndIf
     i += 1
   EndWhile
-	RegisterForSingleUpdate(MCM.iRushedBuffer + 4)
+  If(Main.SurrenderQ.IsRunning())
+    Stop()
+  Else
+    RegisterForSingleUpdate(MCM.iRushedBuffer + 4)
+  EndIf
 EndFunction
 
 State Stage999

@@ -43,7 +43,7 @@ dxSceneThread Function StartSceneFlowergirls(Actor first, Actor[] partners) glob
     Debug.Trace("[Yamete] <Flowergirls> No Thread Found")
     return none
   EndIf
-  If(!partners[1]) ; 2p Scene
+  If(partners.Length == 1) ; 2p Scene
     Form tokenFemale
 	  Form tokenMale
 		If(thread.Participant01.Gender == 0) ; Male

@@ -62,7 +62,7 @@ State Exhausted
 	Event OnEndState()
 		UnregisterForActorAction(8)
 		UnregisterForAllMenus()
-		mySelf.RemoveSpell(calmMark)
+    mySelf.RemoveSpell(calmMark)
 	EndEvent
 EndState
 

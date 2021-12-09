@@ -51,5 +51,22 @@ bool Function StartScene(YamMCM MCM, Actor first, Actor[] others, int asVictim) 
       return 0
     EndIf
   EndIf
-  return -1
+  return false ; -1
+EndFunction
+
+bool Function StartSceneCustom(Actor[] others, bool aggressive) global
+  OSexIntegrationMain OStim = Quest.GetQuest("OSexIntegrationMainQuest") as OSexIntegrationMain
+  
+  Actor third = none
+  If(others.length > 2)
+    third = others[2]
+  EndIf
+
+  OStim.AddSceneMetadata("or_player_nocheat")
+  OStim.AddSceneMetadata("or_npc_nocheat")
+
+  If(OStim.StartScene(others[1], others[0], zThirdActor = third, aggressive = aggressive, AggressingActor = others[1]))
+    return 1
+  EndIf
+  return 0
 EndFunction
