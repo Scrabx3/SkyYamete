@@ -5,7 +5,7 @@ Scriptname SF_YamSurrenderScene_05A184D5 Extends Scene Hidden
 ;BEGIN FRAGMENT Fragment_7
 Function Fragment_7()
 ;BEGIN CODE
-Debug.Trace("[Yamete] Surrender: Phase 3 start")
+; Debug.Trace("[Yamete] Surrender: Phase 3 start")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -32,7 +32,7 @@ EndFunction
 Function Fragment_2()
 ;BEGIN CODE
 ; Phase 1 end
-Debug.Trace("[Yamete] Surrender: Phase 1 End")
+; Debug.Trace("[Yamete] Surrender: Phase 1 End")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -41,7 +41,7 @@ EndFunction
 Function Fragment_3()
 ;BEGIN CODE
 ; Scene Start
-Debug.Trace("[Yamete] Surrender: Scene Start")
+; Debug.Trace("[Yamete] Surrender: Scene Start")
 SetUp()
 ;END CODE
 EndFunction
@@ -50,7 +50,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_6
 Function Fragment_6()
 ;BEGIN CODE
-Debug.Trace("[Yamete] Surrender: Phase 2 start")
+; Debug.Trace("[Yamete] Surrender: Phase 2 start")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -58,7 +58,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_10
 Function Fragment_10()
 ;BEGIN CODE
-Debug.Trace("[Yamete] Surrender: Phase 5 end")
+; Debug.Trace("[Yamete] Surrender: Phase 5 end")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -66,7 +66,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_8
 Function Fragment_8()
 ;BEGIN CODE
-Debug.Trace("[Yamete] Surrender: Phase 4 start")
+; Debug.Trace("[Yamete] Surrender: Phase 4 start")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -74,7 +74,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_5
 Function Fragment_5()
 ;BEGIN CODE
-Debug.Trace("[Yamete] Surrender: Phase 2 end")
+; Debug.Trace("[Yamete] Surrender: Phase 2 end")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -111,7 +111,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_9
 Function Fragment_9()
 ;BEGIN CODE
-Debug.Trace("[Yamete] Surrender: Phase 4 end")
+; Debug.Trace("[Yamete] Surrender: Phase 4 end")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -119,7 +119,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_11
 Function Fragment_11()
 ;BEGIN CODE
-Debug.Trace("[Yamete] Surrender: Phase 5 start")
+; Debug.Trace("[Yamete] Surrender: Phase 5 start")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -161,13 +161,14 @@ Message Property CreatureSurrenderAccept Auto
     - check for a Guard in Combat with the Player. If so, the Guard will take over the Surrender and attempt an arrest
 =============================== /;
 Function Setup()
+  Actor PlayerRef = Game.GetPlayer()
   If(Bystander.GetReference())
     ; Nothing to do if there are 3 parties in a fight
     Error3PartySurrender.Show()
     Debug.Trace("[Yamete] Surrender: Invalid Surrender Request, more than 2 Parties involved.")
     Stop()
     return
-  ElseIf(Game.GetPlayer().HasMagicEffectWithKeyword(BleedoutMark) || Game.GetPlayer().IsBleedingOut())
+  ElseIf(PlayerRef.HasMagicEffectWithKeyword(BleedoutMark) || PlayerRef.IsBleedingOut())
     ErrorPlayerBleedout.Show()
     Debug.Trace("[Yamete] Surrender: Invalid Surrender Request, Player is bleeding out.")
     Stop()
@@ -265,22 +266,32 @@ Function Setup()
     EndIf
     i += 1
   EndWhile
-  ; Processed all Enemies here. If at this point there are no Actors to work with, cancel the surrender
+  ;/ -------------------------
+    Processed all Enemies here
+    Every collects all Actors for an adult Animations
+    • every.Length = 0 and no npc -> Creature Encounter
+    • every.Length = 0 and npc found -> child or elder encounter
+    • every.Length > 0 and no npc -> Creature Encounter with potential adult content
+    • every.Length > 0 and npc -> npc encounter with potential adult content
+  ------------------------- /;
   every = PapyrusUtil.RemoveActor(every, none)
   Debug.Trace("[Yamete] Surrender: Total Actors found = " + every.Length)
-  If(every.Length == 0 && !npc )
-    Stop()
-    return
-  Else
-    ; .. otherwise commit
-    sur.Enemies = every
-  EndIf
+  sur.Enemies = every
+  ; If(every.Length == 0 && !npc)
+  ;   Stop()
+  ;   return
+  ; Else
+  ;   sur.Enemies = every
+  ; EndIf
+  ; Have the Player surrender
+  Game.SetPlayerAIDriven(true)
+  Debug.SendAnimationEvent(PlayerRef, "IdleSurrender")
   ; Stop Combat Quest if running
   Scan.SetStage(999)
   ; Cooldown, so the player can't surrender to them again within 3minutes
   ; ..also Calm Mark to stop & prevent combat during negotiation
   int n = 0
-  Game.GetPlayer().AddSpell(CalmMark, false)
+  PlayerRef.AddSpell(CalmMark, false)
   While(n < Enemies.Length)
     Actor act = Enemies[n].GetReference() as Actor
     If(act)
@@ -321,9 +332,11 @@ Function Setup()
     sur.isOutlaw = npc.GetCrimeFaction() == none
     ; checking for the crime faction will cover all (or most?) enemy factions
     ; there are some false positives with this (like modded followers) but should overall be more precise than checking for individual factions (e.g. forsworn & banditfaction) as it should also recognize enemy factions added by other mods. All folk living in cities usually have their holds crime faction assigned to them, or have a custom one (e.g. guilds)
-    sur.isNude = Game.GetPlayer().GetWornForm(4) == none
+    sur.isNude = PlayerRef.GetWornForm(4) == none
   EndIf
   Debug.Trace("[Yamete] Surrender: Completed Setup, Setting Stage 5")
   GetOwningQuest().SetStage(5)
+  Utility.Wait(2)
+  Game.SetPlayerAIDriven(false)
 EndFunction
 
