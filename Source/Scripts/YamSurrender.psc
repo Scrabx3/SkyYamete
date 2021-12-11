@@ -15,21 +15,33 @@ int Property passItemsGiven Auto Conditional
 Actor[] Property Enemies Auto
 ReferenceAlias Property EnemyNPC Auto
 
+ImageSpaceModifier Property FadeToBlack Auto
+
 ; Bandits or similar selling out the Player to somewhere. 
 ; This is primarily intended to be a SS++ entry though I guess I also doom 
 ; myself to make the Blackmarket a functional market for player selling.. ayah..
 Function SellOut()
+  SetStage(75)
+  FadeToBlack.Apply()
+  Utility.Wait(2.1)
   If(MCM.cSimpleSlavery != 0)
     SendModEvent("SSLV Entry")
-    return
-  EndIf
-  ; This feature isnt fully implemented yet due to the Blackmarket missing player selling. Using Default Sendjail as temporary solution
-  FormList CrimeFactions = Game.GetForm(0x00026953) as FormList
-  Faction cf = CrimeFactions.GetAt(Utility.RandomInt(0, CrimeFactions.GetSize() - 1)) as Faction
-  If(cf)
+  Else
+    ; This feature isnt fully implemented yet due to the Blackmarket missing player selling. Using Default Sendjail as temporary solution
+    FormList CrimeFactions = Game.GetForm(0x00026953) as FormList
+    Faction cf = CrimeFactions.GetAt(Utility.RandomInt(0, CrimeFactions.GetSize() - 1)) as Faction
     cf.ModCrimeGold(600, true)
     cf.SendPlayerToJail()
   EndIf
+  FadeToBlack.Remove()
+  Stop()
+EndFunction
+
+Function Imprison(Faction cf)
+  FadeToBlack.Apply()
+  Utility.Wait(2.1)
+  cf.SendPlayerToJail()
+  FadeToBlack.Remove()
 EndFunction
 
 Function StartScene(String tags = "", Actor victim = none)
@@ -37,7 +49,10 @@ Function StartScene(String tags = "", Actor victim = none)
   Actor[] positions = new Actor[2]
   positions[0] = Game.GetPlayer()
   positions[1] = EnemyNPC.GetActorReference()
-  YamAnimationFrame.StartSceneSurrender(MCM, positions, victim, tags, self)
+  If(YamAnimationFrame.StartSceneSurrender(MCM, positions, victim, tags, self) == -1)
+    SetStage(100)
+    Debug.Notification("Yamete: There was an Error starting the Scene")
+  EndIf
   RegisterForModEvent("HookAnimationEnd_YamSurrender", "AnimEnd")
 EndFunction
 
@@ -56,7 +71,10 @@ Function StartScene3p(String tags = "", Actor victim = none)
     positions[i + 1] = Enemies[i]
     i += 1
   EndWhile
-  YamAnimationFrame.StartSceneSurrender(MCM, positions, victim, tags, self)
+  If(YamAnimationFrame.StartSceneSurrender(MCM, positions, victim, tags, self) == -1)
+    SetStage(100)
+    Debug.Notification("Yamete: There was an Error starting the Scene")
+  EndIf
   RegisterForModEvent("HookAnimationEnd_YamSurrender", "AnimEnd")
 EndFunction
 

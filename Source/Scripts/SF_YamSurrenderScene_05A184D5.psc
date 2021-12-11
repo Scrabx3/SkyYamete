@@ -300,6 +300,9 @@ Function Setup()
     EndIf
     n += 1
   EndWhile
+  Game.GetPlayer().StopCombatAlarm()
+   ; Don't rush too much, the player didnt even put their hands up yet :<
+  Utility.Wait(0.7)
   ; Creature or NPC Consequence?
   If(!npc)
     ;/ -------------------------

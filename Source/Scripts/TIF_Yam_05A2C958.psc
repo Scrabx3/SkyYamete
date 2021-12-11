@@ -12,7 +12,7 @@ If(cf.GetCrimeGold() == 0)
 cf.ModCrimeGold(300)
 EndIf
 
-cf.SendPlayerToJail()
+(GetOwningQuest() as YamSurrender).Imprison(cf)
 ;END CODE
 EndFunction
 ;END FRAGMENT
