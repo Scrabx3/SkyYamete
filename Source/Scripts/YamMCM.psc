@@ -2316,6 +2316,7 @@ String Function IntToString(int x)
 		Else
 			hex += StringUtil.AsChar(55 + c)
 		EndIf
+		x /= 16
 	EndWhile
   While(StringUtil.GetLength(hex) < 6)
     hex = "0" + hex
