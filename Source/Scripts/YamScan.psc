@@ -125,7 +125,7 @@ bool Function IsEveryoneIdling()
   int i = 0
   While(i < myAliases.length)
     String thisState = myAliases[i].GetState()
-    If(thisState != "" && myAliases[i].GetReference() != none)
+    If(thisState != "" && thisState != "Busy" && myAliases[i].GetReference() != none)
       Debug.Trace("[Yamete] IsEveryoneIdling() -> " + myAliases[i].GetName() + " is in State: " + thisState)
       return false
     EndIf

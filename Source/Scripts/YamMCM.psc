@@ -2276,12 +2276,29 @@ Function LoadingMCM(String filepath)
 	iPauseKey = GetIntValue(filePath, "iPauseKey")
 EndFunction
 
-Function excludeActorAggr(Form toExclude)
-  FormListAdd("../Yamete/excluded.json", "actorsAggr", toExclude, false)
-  Debug.Notification((toExclude as Actor).GetLeveledActorBase().GetName() + " is no longer allowed to knock down.")
+bool Function excludeActorAggr(Form toExclude) global
+	Actor a = toExclude as Actor
+	If(a == none)
+		Debug.Messagebox("ERROR: <ExcludeAggressor> Attempting to exclude a non-Actor")
+		return false
+	EndIf
+	ActorBase b = a.GetLeveledActorBase()
+	If(b == none)
+		Debug.Messagebox("ERROR: <Exclude Aggressor> Actorbase is none")
+		return false
+	EndIf
+	String path = "../Yamete/excluded.json"
+	If(FormListHas(path, "actorsAggr", b))
+		Debug.Notification(b.GetName() + " is already excluded")
+		return false
+	Else
+  	FormListAdd(path, "actorsAggr", b, false)
+		Debug.Notification((toExclude as Actor).GetLeveledActorBase().GetName() + " is no longer allowed to knock down.")
+		return true
+	EndIf
 EndFunction
 
-Function excludeActorVic(Form toExclude)
+bool Function excludeActorVic(Form toExclude)
   FormListAdd("../Yamete/excluded.json", "actorsVic", toExclude, false)
   (toExclude as Actor).AddToFaction(exclusionFac)
   Debug.Notification((toExclude as Actor).GetLeveledActorBase().GetName() + " is no longer allowed to be knocked down.")

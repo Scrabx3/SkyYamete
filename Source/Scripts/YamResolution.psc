@@ -253,7 +253,7 @@ EndFunction
 
 Function Stage1000()
   Actor Player = Game.GetPlayer()
-  If(plVic.GetReference())
+  If(Player.HasMagicEffectWithKeyword(bleedoutMarkTmp) || plVic.GetReference())
     Main.standUp(Player)
   EndIf
 	Utility.Wait(3.3) ; Wait for Getup Animation to be over... zzz

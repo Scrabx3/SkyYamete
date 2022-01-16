@@ -287,7 +287,9 @@ Function Setup()
   Game.SetPlayerAIDriven(true)
   Debug.SendAnimationEvent(PlayerRef, "IdleSurrender")
   ; Stop Combat Quest if running
-  Scan.SetStage(999)
+  If(Scan.IsRunning())
+    Scan.SetStage(999)
+  EndIf
   ; Cooldown, so the player can't surrender to them again within 3minutes
   ; ..also Calm Mark to stop & prevent combat during negotiation
   int n = 0

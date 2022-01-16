@@ -57,7 +57,7 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
     If(mySelf.IsBleedingOut() && MCM.bKdEssentialNPC[profile] && myHp < 0)
       Utility.Wait(1.8)
       mySelf.AddSpell(calmMark, false)
-      mySelf.RestoreActorValue("Health", myHp + 20)
+      mySelf.ResetHealthAndLimbs()
       Utility.Wait(3.8)
       If(myAggr != PlayerRef && ValidInteraction(myAggr, true))
         Aggressor = myAggr
@@ -115,7 +115,7 @@ bool Function ValidInteraction(Actor akAggressor, bool fromBleedout = false)
   If(akAggressor == none || mySelf == none || akAggressor == mySelf)
     Debug.Trace("[Yamete] isValidBase received invalid Argument")
     return false
-  ElseIf(JsonUtil.FormListHas("../Yamete/excluded.json", "actorsAggr", akAggressor) || mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW) || akAggressor.IsDead() || mySelf.IsDead() || (akAggressor.IsCommandedActor() && !MCM.bSummonAggr) || (akAggressor.GetRace() == Main.ElderRace && !MCM.bElderAggr))
+  ElseIf(JsonUtil.FormListHas("../Yamete/excluded.json", "actorsAggr", akAggressor.GetLeveledActorBase()) || mySelf.HasMagicEffectWithKeyword(bleedoutMarkKW) || akAggressor.IsDead() || mySelf.IsDead() || (akAggressor.IsCommandedActor() && !MCM.bSummonAggr) || (akAggressor.GetRace() == Main.ElderRace && !MCM.bElderAggr))
     return false
   ElseIf(Main.baboDia != none) ; TODO: Remove this
     If(akAggressor.IsInFaction(Main.baboDia) || mySelf.IsInFaction(Main.baboDia))
