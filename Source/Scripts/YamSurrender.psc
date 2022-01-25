@@ -44,6 +44,29 @@ Function Imprison(Faction cf)
   FadeToBlack.Remove()
 EndFunction
 
+Function StartSceneCreature()
+  SetStage(75)
+  Keyword ActorTypeNPC = Keyword.GetKeyword("ActorTypeNPC")
+  int num = YamAnimationFrame.calcThreesome(MCM, Enemies.Length)
+  Actor[] positions = PapyrusUtil.ActorArray(num)
+  positions[0] = Game.GetPlayer()
+  int i = 0
+  int ii = 1
+  While(ii < num && i < Enemies.Length)
+    If(Enemies[i].HasKeyword(ActorTypeNPC) == false)
+      positions[ii]
+      ii += 1
+    EndIf
+    i += 1
+  EndWhile
+  If(YamAnimationFrame.StartSceneSurrender(MCM, positions, positions[0], "", self) == -1)
+    SetStage(100)
+    Debug.Notification("Yamete: There was an Error starting the Scene")
+    return
+  EndIf
+  RegisterForModEvent("HookAnimationEnd_YamSurrender", "AnimEnd")
+EndFunction
+
 Function StartScene(String tags = "", Actor victim = none)
   SetStage(75)
   Actor[] positions = new Actor[2]
@@ -52,6 +75,7 @@ Function StartScene(String tags = "", Actor victim = none)
   If(YamAnimationFrame.StartSceneSurrender(MCM, positions, victim, tags, self) == -1)
     SetStage(100)
     Debug.Notification("Yamete: There was an Error starting the Scene")
+    return
   EndIf
   RegisterForModEvent("HookAnimationEnd_YamSurrender", "AnimEnd")
 EndFunction

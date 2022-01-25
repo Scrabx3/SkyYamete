@@ -95,12 +95,15 @@ While(j < Enemies.Length)
 EndWhile
 
 ; ; And remove the Calm Mark
+Actor pl = Game.GetPlayer()
 int n = 0
-Game.GetPlayer().RemoveSpell(CalmMark)
+pl.RemoveSpell(CalmMark)
+pl.RemoveFromFaction(Main.Yam_FriendFaction)
 While(n < Enemies.Length)
   Actor tmp = Enemies[n].GetReference() as Actor
   If(tmp)
     tmp.RemoveSpell(CalmMark)
+    tmp.RemoveFromFaction(Main.Yam_FriendFaction)
   EndIf
   n += 1
 EndWhile
@@ -259,7 +262,7 @@ Function Setup()
           every[i] = act
           match = actRace
         ElseIf(actRace == match)
-          ; only allow creatures of same Races (adult scene stuff)
+          ; only allow creatures of same Races
           every[i] = act
         EndIf
       EndIf
@@ -319,7 +322,7 @@ Function Setup()
       GetOwningQuest().SetStage(100)
     ElseIf(MCM.FrameCreature) ; ---------- Assault
       Debug.Trace("[Yamete] Surrender: Creature Assaults")
-      sur.StartScene()
+      sur.StartSceneCreature()
     Else ; ------------------------------- Ignore
       Debug.Trace("[Yamete] Surrender: Creature Ignores")
       CreatureSurrenderIgnore.Show()
