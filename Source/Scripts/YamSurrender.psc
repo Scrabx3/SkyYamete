@@ -46,15 +46,16 @@ EndFunction
 
 Function StartSceneCreature()
   SetStage(75)
+  Debug.Trace("[Yamete] Starting Scene Creatures >> " + Enemies)
   Keyword ActorTypeNPC = Keyword.GetKeyword("ActorTypeNPC")
-  int num = YamAnimationFrame.calcThreesome(MCM, Enemies.Length)
+  int num = YamAnimationFrame.calcThreesome(MCM, Enemies.Length + 1)
   Actor[] positions = PapyrusUtil.ActorArray(num)
   positions[0] = Game.GetPlayer()
   int i = 0
   int ii = 1
   While(ii < num && i < Enemies.Length)
     If(Enemies[i].HasKeyword(ActorTypeNPC) == false)
-      positions[ii]
+      positions[ii] = Enemies[i]
       ii += 1
     EndIf
     i += 1

@@ -2,10 +2,10 @@
 ;NEXT FRAGMENT INDEX 12
 Scriptname SF_YamSurrenderScene_05A184D5 Extends Scene Hidden
 
-;BEGIN FRAGMENT Fragment_7
-Function Fragment_7()
+;BEGIN FRAGMENT Fragment_10
+Function Fragment_10()
 ;BEGIN CODE
-; Debug.Trace("[Yamete] Surrender: Phase 3 start")
+; Debug.Trace("[Yamete] Surrender: Phase 5 end")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -28,11 +28,18 @@ EndIf
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_2
-Function Fragment_2()
+;BEGIN FRAGMENT Fragment_9
+Function Fragment_9()
 ;BEGIN CODE
-; Phase 1 end
-; Debug.Trace("[Yamete] Surrender: Phase 1 End")
+; Debug.Trace("[Yamete] Surrender: Phase 4 end")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_7
+Function Fragment_7()
+;BEGIN CODE
+; Debug.Trace("[Yamete] Surrender: Phase 3 start")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -43,38 +50,6 @@ Function Fragment_3()
 ; Scene Start
 ; Debug.Trace("[Yamete] Surrender: Scene Start")
 SetUp()
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_6
-Function Fragment_6()
-;BEGIN CODE
-; Debug.Trace("[Yamete] Surrender: Phase 2 start")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_10
-Function Fragment_10()
-;BEGIN CODE
-; Debug.Trace("[Yamete] Surrender: Phase 5 end")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_8
-Function Fragment_8()
-;BEGIN CODE
-; Debug.Trace("[Yamete] Surrender: Phase 4 start")
-;END CODE
-EndFunction
-;END FRAGMENT
-
-;BEGIN FRAGMENT Fragment_5
-Function Fragment_5()
-;BEGIN CODE
-; Debug.Trace("[Yamete] Surrender: Phase 2 end")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -111,10 +86,18 @@ EndWhile
 EndFunction
 ;END FRAGMENT
 
-;BEGIN FRAGMENT Fragment_9
-Function Fragment_9()
+;BEGIN FRAGMENT Fragment_8
+Function Fragment_8()
 ;BEGIN CODE
-; Debug.Trace("[Yamete] Surrender: Phase 4 end")
+; Debug.Trace("[Yamete] Surrender: Phase 4 start")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_5
+Function Fragment_5()
+;BEGIN CODE
+; Debug.Trace("[Yamete] Surrender: Phase 2 end")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -122,7 +105,24 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_11
 Function Fragment_11()
 ;BEGIN CODE
-; Debug.Trace("[Yamete] Surrender: Phase 5 start")
+Debug.Trace("[Yamete] Surrender: Phase 5 start")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_2
+Function Fragment_2()
+;BEGIN CODE
+; Phase 1 end
+; Debug.Trace("[Yamete] Surrender: Phase 1 End")
+;END CODE
+EndFunction
+;END FRAGMENT
+
+;BEGIN FRAGMENT Fragment_6
+Function Fragment_6()
+;BEGIN CODE
+; Debug.Trace("[Yamete] Surrender: Phase 2 start")
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -245,6 +245,7 @@ Function Setup()
             ElseIf(!child && !elder)
               ; we only want npc here that are neihter child nor elder
               every[i] = act
+              Debug.Trace("[Yamete] Adding Actor = " + every[i])
               float confi = act.GetActorValue("Confidence")
               If(confi > npcConfi)
                 ; if this NPCs confidence is higher than the previous one, replace the old one with the new one
@@ -258,12 +259,15 @@ Function Setup()
         ; Creatures, skip them if a NPC has been found already and only if we allow Creature Scenes
         ; (The individual creature enemies only matter for adult scenes)
         Race actRace = act.GetRace()
+        Debug.Trace("[Yamete] Adding Creature = " + every[i] + " >> Race = " + match)
         If(!match) ; define matching Race
           every[i] = act
           match = actRace
+          Debug.Trace("[Yamete] Setting Creature Race = " + match)
         ElseIf(actRace == match)
           ; only allow creatures of same Races
           every[i] = act
+          ; Debug.Trace("[Yamete] Adding Creature = " + every[i])
         EndIf
       EndIf
     EndIf
@@ -277,15 +281,11 @@ Function Setup()
     • every.Length > 0 and no npc -> Creature Encounter with potential adult content
     • every.Length > 0 and npc -> npc encounter with potential adult content
   ------------------------- /;
+  Debug.Trace("[Yamete] Surrender: Total Actors found >> " + every)
   every = PapyrusUtil.RemoveActor(every, none)
-  Debug.Trace("[Yamete] Surrender: Total Actors found = " + every.Length)
+  ; Debug.Trace("[Yamete] Surrender: Filter none >> " + every)
   sur.Enemies = every
-  ; If(every.Length == 0 && !npc)
-  ;   Stop()
-  ;   return
-  ; Else
-  ;   sur.Enemies = every
-  ; EndIf
+  ; Debug.Trace("[Yamete] Surrender: Enemies on Main Script >> " + sur.Enemies)
   ; Have the Player surrender
   Game.SetPlayerAIDriven(true)
   Debug.SendAnimationEvent(PlayerRef, "IdleSurrender")
@@ -293,19 +293,17 @@ Function Setup()
   If(Scan.IsRunning())
     Scan.SetStage(999)
   EndIf
+  PlayerRef.StopCombatAlarm()
   ; Cooldown, so the player can't surrender to them again within 3minutes
   ; ..also Calm Mark to stop & prevent combat during negotiation
   int n = 0
   PlayerRef.AddSpell(CalmMark, false)
-  While(n < Enemies.Length)
-    Actor act = Enemies[n].GetReference() as Actor
-    If(act)
-      act.AddSpell(CalmMark, false)
-      CooldownSpell.Cast(act)
-    EndIf
+  While(n < every.Length)
+    every[n].AddSpell(CalmMark, false)
+    CooldownSpell.Cast(every[n])
     n += 1
   EndWhile
-  Game.GetPlayer().StopCombatAlarm()
+  PlayerRef.StopCombatAlarm()
    ; Don't rush too much, the player didnt even put their hands up yet :<
   Utility.Wait(0.7)
   ; Creature or NPC Consequence?
